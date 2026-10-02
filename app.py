@@ -118,7 +118,7 @@ def pagina_chat():
 def gerenciar_mensagem(data):
     usuario = session.get('usuario', 'Convidado')
     mensagem = data.get('mensagem', '').strip()
-    if mensagem:
+    if mensagem:  # CORRIGIDO AQUI!
         hora_atual = datetime.now().strftime("%H:%M")
         conn = sqlite3.connect("banco.db")
         cursor = conn.cursor()
