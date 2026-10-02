@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_socketio import SocketIO, emit
-from datetime import datetime, timedelta
+from datetime import datetime
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -112,6 +112,65 @@ def init_db():
 
 
 init_db()
+
+
+# =========================================================
+# CRIAR ADM PRINCIPAL
+# =========================================================
+
+def criar_admin():
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id
+        FROM usuarios
+        WHERE tipo = 'admin'
+        LIMIT 1
+    """)
+
+    admin_existente = cursor.fetchone()
+
+    if not admin_existente:
+
+        admin_usuario = "admin"
+        admin_senha = "admin123"
+
+        senha_hash = generate_password_hash(
+            admin_senha
+        )
+
+        criado_em = datetime.now().isoformat()
+
+        cursor.execute("""
+            INSERT INTO usuarios
+            (
+                nome,
+                usuario,
+                senha,
+                tipo,
+                banido,
+                ban_expira,
+                criado_em
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            "Administrador",
+            admin_usuario,
+            senha_hash,
+            "admin",
+            0,
+            None,
+            criado_em
+        ))
+
+        conn.commit()
+
+    conn.close()
+
+
+criar_admin()
 
 
 # =========================================================
@@ -308,7 +367,7 @@ def cadastrar():
         return "Esse usuário já existe."
 
     # -----------------------------------------
-    # CRIA A CONTA
+    # CRIA CONTA NORMAL
     # -----------------------------------------
 
     senha_hash = generate_password_hash(senha)
