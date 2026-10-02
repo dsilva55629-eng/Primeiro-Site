@@ -4,214 +4,49 @@
     <meta charset="UTF-8">
     <title>Painel do Davi - Menu</title>
     <style>
-        :root {
-            --bg: linear-gradient(135deg, #12121f, #1a1a2e);
-            --container: #1f1f33;
-            --primary: #00ff88;
-            --text: #f5f5f7;
-            --input: #151524;
-            --border: #3d3d5c;
-            --text-btn: #121214;
-        }
-
-        [data-theme="light"] {
-            --bg: linear-gradient(135deg, #e0e5ec, #f0f4f8);
-            --container: #ffffff;
-            --primary: #007bff;
-            --text: #2b2b40;
-            --input: #f5f7fa;
-            --border: #d1d9e6;
-            --text-btn: #ffffff;
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            transition: background 0.3s ease;
-        }
-
-        /* Topo e Relógio no Canto */
-        .header-status {
-            width: 100%;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-            background-color: var(--container);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .relogio {
-            font-family: monospace;
-            font-size: 16px;
-            color: var(--primary);
-            background: var(--input);
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .btn-tema {
-            background: var(--primary);
-            color: var(--text-btn);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .container-menu {
-            margin: auto;
-            background-color: var(--container);
-            padding: 40px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .assinatura {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        .assinatura span { color: var(--primary); }
-        
-        .nave {
-            display: inline-block;
-            font-size: 36px;
-            animation: flutuar 1.5s ease-in-out infinite;
-        }
-
-        @keyframes flutuar {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(8deg); }
-        }
-
-        .user-section {
-            margin-bottom: 30px;
-            padding: 15px;
-            background: var(--input);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .user-section input {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: var(--container);
-            color: var(--text);
-            text-align: center;
-        }
-
-        .user-section button {
-            padding: 10px 15px;
-            background: var(--primary);
-            color: var(--text-btn);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .botoes-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .btn-link {
-            display: block;
-            padding: 18px;
-            background: var(--input);
-            color: var(--text);
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            border-left: 5px solid var(--primary);
-            border-top: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            transition: 0.2s;
-        }
-
-        .btn-link:hover {
-            transform: translateX(5px);
-            background: var(--border);
-        }
+        :root { --bg: linear-gradient(135deg, #12121f, #1a1a2e); --container: #1f1f33; --primary: #00ff88; --text: #f5f5f7; --input: #151524; --border: #3d3d5c; --text-btn: #121214; }
+        [data-theme="light"] { --bg: linear-gradient(135deg, #e0e5ec, #f0f4f8); --container: #ffffff; --primary: #007bff; --text: #2b2b40; --input: #f5f7fa; --border: #d1d9e6; --text-btn: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; min-height: 100vh; transition: background 0.3s ease; }
+        .header-status { width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; background-color: var(--container); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .relogio { font-family: monospace; font-size: 16px; color: var(--primary); background: var(--input); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); }
+        .btn-tema { background: var(--primary); color: var(--text-btn); border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .container-menu { margin: auto; background-color: var(--container); padding: 40px; border-radius: 16px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .assinatura { font-size: 32px; font-weight: bold; margin-bottom: 35px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .nave { display: inline-block; font-size: 36px; animation: flutuar 1.5s ease-in-out infinite; }
+        @keyframes flutuar { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(8deg); } }
+        .botoes-menu { display: flex; flex-direction: column; gap: 15px; }
+        .btn-link { display: block; padding: 18px; background: var(--input); color: var(--text); text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold; border-left: 5px solid var(--primary); border: 1px solid var(--border); transition: 0.2s; }
+        .btn-link:hover { transform: translateX(5px); background: var(--border); }
+        .logout { color: #ff5555; text-decoration: none; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div class="header-status">
-        <div>👤 Usuário: <strong>{{ usuario }}</strong></div>
+        <div>👤 Perfil: <strong>{{ usuario }}</strong> | <a href="/logout" class="logout">Sair</a></div>
         <div style="display: flex; gap: 15px; align-items: center;">
-            <!-- BOTÃO TEMA CORRIGIDO -->
             <button class="btn-tema" id="toggleTema" onclick="alternarTema()">☀️ Modo Claro</button>
-            <!-- RELÓGIO CORRIGIDO -->
             <div class="relogio" id="relogio-digital">00/00/0000 - 00:00:00</div>
         </div>
     </div>
-
     <div class="container-menu">
         <div class="assinatura">By Davi <span class="nave">🚀</span></div>
-        
-        <div class="user-section">
-            <form action="/definir_usuario" method="POST">
-                <input type="text" name="nome_usuario" placeholder="Mudar seu Usuário..." required>
-                <button type="submit">Alterar</button>
-            </form>
-        </div>
-
         <div class="botoes-menu">
             <a href="/bloco" class="btn-link">📝 Abrir Bloco de Notas</a>
             <a href="/mural" class="btn-link">💬 Abrir Mural de Recados</a>
+            <!-- O BOTÃO DO CHAT AQUI -->
+            <a href="/chat" class="btn-link" style="border-left-color: #ff00ff;">💬 Abrir Chat Online</a>
         </div>
     </div>
-
     <script>
-        // FUNÇÃO DO RELÓGIO CORRIGIDA (Date com 'D' maiúsculo)
         function atualizarRelogio() {
             const agora = new Date();
-            const dia = String(agora.getDate()).padStart(2, '0');
-            const mes = String(agora.getMonth() + 1).padStart(2, '0');
-            const ano = agora.getFullYear();
-            const horas = String(agora.getHours()).padStart(2, '0');
-            const minutos = String(agora.getMinutes()).padStart(2, '0');
-            const segundos = String(agora.getSeconds()).padStart(2, '0');
-            
-            document.getElementById('relogio-digital').innerText = `${dia}/${mes}/${ano} - ${horas}:${minutos}:${segundos}`;
+            document.getElementById('relogio-digital').innerText = `${String(agora.getDate()).padStart(2, '0')}/${String(agora.getMonth() + 1).padStart(2, '0')}/${agora.getFullYear()} - ${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}:${String(agora.getSeconds()).padStart(2, '0')}`;
         }
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
-
-        // FUNÇÃO DE ALTERNAR TEMA
+        setInterval(atualizarRelogio, 1000); atualizarRelogio();
         function alternarTema() {
-            const body = document.documentElement;
-            const botao = document.getElementById('toggleTema');
-            
-            if (body.getAttribute('data-theme') === 'light') {
-                body.removeAttribute('data-theme');
-                botao.innerText = "☀️ Modo Claro";
-            } else {
-                body.setAttribute('data-theme', 'light');
-                botao.innerText = "🌙 Modo Escuro";
-            }
+            const body = document.documentElement; const botao = document.getElementById('toggleTema');
+            if (body.getAttribute('data-theme') === 'light') { body.removeAttribute('data-theme'); botao.innerText = "☀️ Modo Claro"; }
+            else { body.setAttribute('data-theme', 'light'); botao.innerText = "🌙 Modo Escuro"; }
         }
     </script>
 </body>
