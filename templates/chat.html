@@ -9,32 +9,62 @@
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
     <style>
+        :root {
+            --bg: linear-gradient(135deg, #12121f, #1a1a2e);
+            --container: #1f1f33;
+            --input: #151524;
+            --border: #3d3d5c;
+            --text: #f5f5f7;
+            --primary: #00ff88;
+            --mensagem: #292940;
+            --botao: #00ff88;
+            --botao-texto: #121214;
+        }
+
+        [data-theme="light"] {
+            --bg: linear-gradient(135deg, #e0e5ec, #f0f4f8);
+            --container: #ffffff;
+            --input: #f5f7fa;
+            --border: #d1d9e6;
+            --text: #2b2b40;
+            --primary: #007bff;
+            --mensagem: #e9edf3;
+            --botao: #007bff;
+            --botao-texto: #ffffff;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            color: #222;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
-            width: 100%;
+            width: 95%;
             max-width: 700px;
-            height: 100vh;
-            margin: auto;
+            height: 90vh;
+            margin: 5vh auto;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: var(--container);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .topo {
-            background: #222;
-            color: white;
+            background: var(--container);
+            color: var(--text);
             padding: 18px;
             text-align: center;
+            border-bottom: 1px solid var(--border);
         }
 
         .topo h1 {
@@ -45,7 +75,7 @@
         .usuario {
             margin-top: 5px;
             font-size: 14px;
-            color: #ccc;
+            opacity: 0.7;
         }
 
         #mensagens {
@@ -58,7 +88,7 @@
         }
 
         .mensagem {
-            background: #eeeeee;
+            background: var(--mensagem);
             padding: 10px 12px;
             border-radius: 10px;
             max-width: 85%;
@@ -67,12 +97,13 @@
 
         .nome {
             font-weight: bold;
+            color: var(--primary);
             margin-right: 6px;
         }
 
         .hora {
             font-size: 11px;
-            color: #777;
+            opacity: 0.6;
             margin-left: 6px;
         }
 
@@ -80,48 +111,58 @@
             display: flex;
             gap: 8px;
             padding: 12px;
-            border-top: 1px solid #ddd;
-            background: #fafafa;
+            border-top: 1px solid var(--border);
+            background: var(--container);
         }
 
         #mensagem {
             flex: 1;
             padding: 12px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border);
             border-radius: 8px;
             outline: none;
             font-size: 15px;
+            background: var(--input);
+            color: var(--text);
+        }
+
+        #mensagem::placeholder {
+            color: var(--text);
+            opacity: 0.5;
         }
 
         #mensagem:focus {
-            border-color: #555;
+            border-color: var(--primary);
         }
 
         button {
             padding: 12px 18px;
             border: none;
             border-radius: 8px;
-            background: #222;
-            color: white;
+            background: var(--botao);
+            color: var(--botao-texto);
             cursor: pointer;
             font-size: 15px;
+            font-weight: bold;
         }
 
         button:hover {
-            background: #444;
+            opacity: 0.85;
         }
 
         .voltar {
             display: block;
             text-align: center;
-            padding: 10px;
-            color: #555;
+            padding: 12px;
+            color: var(--text);
+            background: var(--container);
             text-decoration: none;
             font-size: 14px;
+            border-top: 1px solid var(--border);
         }
 
         .voltar:hover {
-            text-decoration: underline;
+            background: var(--input);
         }
     </style>
 </head>
@@ -134,7 +175,8 @@
         <h1>💬 Chat</h1>
 
         <div class="usuario">
-            Você está como: <strong>{{ usuario }}</strong>
+            Você está como:
+            <strong>{{ usuario }}</strong>
         </div>
     </div>
 
@@ -151,6 +193,7 @@
     </div>
 
     <form class="formulario" id="formulario">
+
         <input
             type="text"
             id="mensagem"
@@ -159,64 +202,148 @@
             maxlength="500"
         >
 
-        <button type="submit">Enviar</button>
+        <button type="submit">
+            Enviar
+        </button>
+
     </form>
 
-    <a href="/" class="voltar">← Voltar</a>
+    <a href="/" class="voltar">
+        ← Voltar ao menu
+    </a>
 
 </div>
 
 <script>
+
+    // =========================
+    // TEMA
+    // =========================
+
+    function aplicarTema() {
+
+        const tema = localStorage.getItem("tema") || "dark";
+
+        if (tema === "light") {
+
+            document.documentElement.setAttribute(
+                "data-theme",
+                "light"
+            );
+
+        } else {
+
+            document.documentElement.removeAttribute(
+                "data-theme"
+            );
+        }
+    }
+
+    aplicarTema();
+
+
+    // =========================
+    // SOCKET.IO
+    // =========================
+
     const socket = io();
 
-    const formulario = document.getElementById("formulario");
-    const input = document.getElementById("mensagem");
-    const mensagens = document.getElementById("mensagens");
+    const formulario =
+        document.getElementById("formulario");
 
-    formulario.addEventListener("submit", function(event) {
-        event.preventDefault();
+    const input =
+        document.getElementById("mensagem");
 
-        const mensagem = input.value.trim();
+    const mensagens =
+        document.getElementById("mensagens");
 
-        if (mensagem === "") {
-            return;
+
+    // =========================
+    // ENVIAR MENSAGEM
+    // =========================
+
+    formulario.addEventListener(
+        "submit",
+        function(event) {
+
+            event.preventDefault();
+
+            const mensagem =
+                input.value.trim();
+
+            if (mensagem === "") {
+                return;
+            }
+
+            socket.emit(
+                "enviar_mensagem",
+                {
+                    mensagem: mensagem
+                }
+            );
+
+            input.value = "";
+            input.focus();
         }
+    );
 
-        socket.emit("enviar_mensagem", {
-            mensagem: mensagem
-        });
 
-        input.value = "";
-        input.focus();
-    });
+    // =========================
+    // RECEBER MENSAGEM
+    // =========================
 
-    socket.on("receber_mensagem", function(data) {
+    socket.on(
+        "receber_mensagem",
+        function(data) {
 
-        const div = document.createElement("div");
-        div.className = "mensagem";
+            const div =
+                document.createElement("div");
 
-        const nome = document.createElement("span");
-        nome.className = "nome";
-        nome.textContent = data.usuario + ":";
+            div.className = "mensagem";
 
-        const texto = document.createElement("span");
-        texto.textContent = data.mensagem;
 
-        const hora = document.createElement("span");
-        hora.className = "hora";
-        hora.textContent = data.hora;
+            const nome =
+                document.createElement("span");
 
-        div.appendChild(nome);
-        div.appendChild(texto);
-        div.appendChild(hora);
+            nome.className = "nome";
 
-        mensagens.appendChild(div);
+            nome.textContent =
+                data.usuario + ":";
 
-        mensagens.scrollTop = mensagens.scrollHeight;
-    });
 
-    // Deixa o chat já na última mensagem quando abrir
-    mensagens.scrollTop = mensagens.scrollHeight;
+            const texto =
+                document.createElement("span");
+
+            texto.textContent =
+                data.mensagem;
+
+
+            const hora =
+                document.createElement("span");
+
+            hora.className = "hora";
+
+            hora.textContent =
+                data.hora;
+
+
+            div.appendChild(nome);
+            div.appendChild(texto);
+            div.appendChild(hora);
+
+
+            mensagens.appendChild(div);
+
+            mensagens.scrollTop =
+                mensagens.scrollHeight;
+        }
+    );
+
+
+    // Vai direto para a última mensagem
+    mensagens.scrollTop =
+        mensagens.scrollHeight;
+
 </script>
 
 </body>
