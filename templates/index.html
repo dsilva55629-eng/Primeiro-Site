@@ -16,6 +16,7 @@
             --input: #151524;
             --border: #3d3d5c;
             --text-btn: #121214;
+            --barra: rgba(31, 31, 51, 0.96);
         }
 
         [data-theme="light"] {
@@ -26,6 +27,11 @@
             --input: #f5f7fa;
             --border: #d1d9e6;
             --text-btn: #ffffff;
+            --barra: rgba(255, 255, 255, 0.96);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -33,21 +39,122 @@
             background: var(--bg);
             color: var(--text);
             margin: 0;
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
             transition: background 0.3s ease, color 0.3s ease;
+            padding-left: 78px;
         }
+
+        /* =========================
+           BARRA LATERAL - PC
+        ========================= */
+
+        .barra-navegacao {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 78px;
+            height: 100vh;
+            background: var(--barra);
+            border-right: 1px solid var(--border);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            padding: 18px 0;
+            z-index: 1000;
+        }
+
+        .nav-cima,
+        .nav-baixo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-baixo {
+            margin-top: auto;
+        }
+
+        .nav-item {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            color: var(--text);
+            text-decoration: none;
+
+            font-size: 25px;
+
+            border: 1px solid transparent;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--input);
+            border-color: var(--border);
+            transform: translateX(3px);
+        }
+
+        .nav-item.home {
+            background: var(--primary);
+            color: var(--text-btn);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.18);
+        }
+
+        [data-theme="light"] .nav-item.home {
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.18);
+        }
+
+        .nav-item.admin {
+            color: #ffaa00;
+        }
+
+        .nav-item.sair {
+            color: #ff5555;
+        }
+
+        /* =========================
+           TOPO
+        ========================= */
 
         .header-status {
             width: 100%;
             padding: 15px 30px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-sizing: border-box;
+
             background-color: var(--container);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .perfil {
+            font-size: 15px;
+        }
+
+        .logout {
+            color: #ff5555;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .controles-topo {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
 
         .relogio {
@@ -70,21 +177,29 @@
             font-weight: bold;
         }
 
+        /* =========================
+           MENU CENTRAL
+        ========================= */
+
         .container-menu {
             margin: auto;
             background-color: var(--container);
             padding: 40px;
             border-radius: 16px;
+
             width: 90%;
             max-width: 500px;
+
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .assinatura {
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 35px;
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -92,13 +207,14 @@
         }
 
         .nave {
-            display: inline-block;
             font-size: 36px;
             animation: flutuar 1.5s ease-in-out infinite;
         }
 
         @keyframes flutuar {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) rotate(0deg);
             }
 
@@ -107,57 +223,236 @@
             }
         }
 
+        /* Esconde os antigos botões do menu */
         .botoes-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: none;
         }
 
-        .btn-link {
-            display: block;
-            padding: 18px;
-            background: var(--input);
-            color: var(--text);
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            border-left: 5px solid var(--primary);
-            border: 1px solid var(--border);
-            transition: 0.2s;
+        /* =========================
+           CELULAR
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            body {
+                padding-left: 0;
+                padding-bottom: 82px;
+            }
+
+            /* Barra passa para baixo */
+
+            .barra-navegacao {
+                top: auto;
+                bottom: 0;
+                left: 0;
+
+                width: 100%;
+                height: 72px;
+
+                flex-direction: row;
+                justify-content: center;
+
+                padding: 8px 10px;
+
+                border-right: none;
+                border-top: 1px solid var(--border);
+
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+            }
+
+            .nav-cima,
+            .nav-baixo {
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .nav-baixo {
+                margin-top: 0;
+            }
+
+            .nav-item {
+                width: 48px;
+                height: 48px;
+                font-size: 23px;
+            }
+
+            /* Casa no meio */
+
+            .nav-cima {
+                order: 1;
+            }
+
+            .nav-baixo {
+                order: 3;
+            }
+
+            .home-wrapper {
+                order: 2;
+            }
+
+            /* Topo */
+
+            .header-status {
+                padding: 12px 15px;
+                gap: 10px;
+            }
+
+            .perfil {
+                font-size: 13px;
+            }
+
+            .controles-topo {
+                gap: 7px;
+            }
+
+            .btn-tema {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .relogio {
+                font-size: 12px;
+                padding: 7px 8px;
+            }
+
+            /* Menu */
+
+            .container-menu {
+                width: calc(100% - 30px);
+                padding: 30px 20px;
+                margin: 25px auto;
+            }
+
+            .assinatura {
+                font-size: 27px;
+                margin-bottom: 20px;
+            }
+
+            .nave {
+                font-size: 31px;
+            }
         }
 
-        .btn-link:hover {
-            transform: translateX(5px);
-            background: var(--border);
-        }
+        /* Celulares menores */
 
-        .logout {
-            color: #ff5555;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-        }
+        @media (max-width: 430px) {
 
-        .admin-btn {
-            border-left-color: #ffaa00;
+            .perfil {
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .relogio {
+                display: none;
+            }
+
+            .btn-tema {
+                font-size: 11px;
+            }
+
+            .nav-item {
+                width: 44px;
+                height: 44px;
+            }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- =========================
+         BARRA DE NAVEGAÇÃO
+    ========================== -->
+
+    <nav class="barra-navegacao">
+
+        <div class="nav-cima">
+
+            <!-- Bloco -->
+            <a href="/bloco"
+               class="nav-item"
+               title="Bloco de Notas">
+                📝
+            </a>
+
+            <!-- Mural -->
+            <a href="/mural"
+               class="nav-item"
+               title="Mural">
+                📋
+            </a>
+
+        </div>
+
+
+        <!-- CASA -->
+        <div class="home-wrapper">
+
+            <a href="/"
+               class="nav-item home"
+               title="Menu">
+                🏠
+            </a>
+
+        </div>
+
+
+        <div class="nav-baixo">
+
+            <!-- Chat -->
+            <a href="/chat"
+               class="nav-item"
+               title="Chat">
+                💬
+            </a>
+
+
+            {% if eh_admin %}
+
+            <!-- ADM -->
+            <a href="/admin"
+               class="nav-item admin"
+               title="Painel Administrativo">
+                🛠️
+            </a>
+
+            {% endif %}
+
+            <!-- Sair -->
+            <a href="/logout"
+               class="nav-item sair"
+               title="Sair">
+                🚪
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================
+         TOPO
+    ========================== -->
+
     <div class="header-status">
 
-        <div>
-            👤 Perfil: <strong>{{ usuario }}</strong> |
+        <div class="perfil">
+
+            👤 Perfil:
+            <strong>{{ usuario }}</strong>
+
+            <span> | </span>
 
             <a href="/logout" class="logout">
                 Sair
             </a>
+
         </div>
 
-        <div style="display: flex; gap: 15px; align-items: center;">
+
+        <div class="controles-topo">
 
             <button
                 class="btn-tema"
@@ -167,6 +462,7 @@
                 ☀️ Modo Claro
 
             </button>
+
 
             <div
                 class="relogio"
@@ -181,6 +477,10 @@
     </div>
 
 
+    <!-- =========================
+         MENU
+    ========================== -->
+
     <div class="container-menu">
 
         <div class="assinatura">
@@ -193,50 +493,9 @@
 
         </div>
 
-
-        <div class="botoes-menu">
-
-            {% if eh_admin %}
-
-            <a
-                href="/admin"
-                class="btn-link admin-btn">
-
-                🛠️ Painel Administrativo
-
-            </a>
-
-            {% endif %}
-
-
-            <a
-                href="/bloco"
-                class="btn-link">
-
-                📝 Abrir Bloco de Notas
-
-            </a>
-
-
-            <a
-                href="/mural"
-                class="btn-link">
-
-                💬 Abrir Mural de Recados
-
-            </a>
-
-
-            <a
-                href="/chat"
-                class="btn-link"
-                style="border-left-color: #ff00ff;">
-
-                💬 Abrir Chat Online
-
-            </a>
-
-        </div>
+        <p>
+            Escolha uma opção pelo menu.
+        </p>
 
     </div>
 
