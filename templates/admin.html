@@ -2,12 +2,17 @@
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Painel ADM</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -38,7 +43,9 @@
 
         .painel {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
             gap: 18px;
         }
 
@@ -59,59 +66,122 @@
             font-size: 14px;
         }
 
-        .voltar {
-            display: inline-block;
+        .botoes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             margin-top: 30px;
-            padding: 10px 16px;
+        }
+
+        .botao {
+            display: inline-block;
+            padding: 11px 17px;
             background: #2a2a2a;
             color: white;
             text-decoration: none;
             border-radius: 8px;
+            border: 1px solid #444;
         }
 
-        .voltar:hover {
+        .botao:hover {
             background: #383838;
         }
+
+        .site {
+            background: #163d2a;
+            border-color: #245f40;
+        }
+
+        .sair {
+            background: #3d1919;
+            border-color: #642626;
+        }
+
     </style>
+
 </head>
 
 <body>
 
     <div class="container">
 
-        <h1>Painel Administrativo</h1>
+        <h1>
+            🛠️ Painel Administrativo
+        </h1>
 
         <p class="subtitulo">
             Área exclusiva do administrador
         </p>
 
+
         <div class="painel">
 
             <div class="card">
+
                 <h2>👤 Usuários</h2>
-                <p>Gerenciar contas e perfis.</p>
+
+                <p>
+                    Gerenciar contas e perfis.
+                </p>
+
             </div>
 
+
             <div class="card">
+
                 <h2>🚫 Banimentos</h2>
-                <p>Banir, desbanir e controlar contas.</p>
+
+                <p>
+                    Banir, desbanir e controlar contas.
+                </p>
+
             </div>
 
+
             <div class="card">
+
                 <h2>💬 Mensagens</h2>
-                <p>Gerenciar mensagens do chat.</p>
+
+                <p>
+                    Gerenciar mensagens do chat.
+                </p>
+
             </div>
 
+
             <div class="card">
+
                 <h2>⚙️ Configurações</h2>
-                <p>Controles gerais do site.</p>
+
+                <p>
+                    Controles gerais do site.
+                </p>
+
             </div>
 
         </div>
 
-        <a href="/" class="voltar">
-            ← Voltar para o site
-        </a>
+
+        <div class="botoes">
+
+            <a
+                href="/"
+                class="botao site">
+
+                🌐 Ir para o site
+
+            </a>
+
+
+            <a
+                href="/logout"
+                class="botao sair">
+
+                🚪 Sair
+
+            </a>
+
+        </div>
 
     </div>
 
