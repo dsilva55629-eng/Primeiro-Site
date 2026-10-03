@@ -1,30 +1,27 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_socketio import SocketIO, emit
-from datetime import datetime
-import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
+import sqlite3
 
+
+# =========================================================
+# CONFIGURAÇÃO
+# =========================================================
 
 app = Flask(__name__)
 
-# =========================================================
-# CONFIGURAÇÕES
-# =========================================================
-
 app.secret_key = "chave_secreta_do_davi"
-
-app.config['PERMANENT_SESSION_LIFETIME'] = (
-    60 * 60 * 24 * 365 * 100
-)
+app.permanent_session_lifetime = timedelta(days=36500)
 
 socketio = SocketIO(
     app,
-    async_mode='eventlet'
+    async_mode="eventlet"
 )
 
 
 # =========================================================
-# DADOS DO ADM PRINCIPAL
+# ADMIN PRINCIPAL
 # =========================================================
 
 ADMIN_USUARIO = "adm_master_47"
@@ -44,71 +41,50 @@ def init_db():
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    # =====================================================
-    # USUÁRIOS
-    # =====================================================
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             usuario TEXT UNIQUE NOT NULL,
             senha TEXT NOT NULL,
-            tipo TEXT NOT NULL DEFAULT 'usuario',
-            banido INTEGER NOT NULL DEFAULT 0,
+            tipo TEXT DEFAULT 'usuario',
+            banido INTEGER DEFAULT 0,
             ban_expira TEXT,
             criado_em TEXT NOT NULL
         )
     """)
 
-    # =====================================================
-    # BLOCO DE NOTAS
-    # =====================================================
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS notas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario TEXT,
-            conteudo TEXT
+            usuario TEXT NOT NULL,
+            titulo TEXT,
+            texto TEXT,
+            criado_em TEXT NOT NULL
         )
     """)
-
-    # =====================================================
-    # MURAL
-    # =====================================================
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS mural (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario TEXT,
-            texto TEXT,
-            hora TEXT
+            usuario TEXT NOT NULL,
+            texto TEXT NOT NULL,
+            criado_em TEXT NOT NULL
         )
     """)
-
-    # =====================================================
-    # CHAT
-    # =====================================================
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS chat (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario TEXT,
-            mensagem TEXT,
-            hora TEXT
+            usuario TEXT NOT NULL,
+            mensagem TEXT NOT NULL,
+            criado_em TEXT NOT NULL
         )
     """)
 
     conn.commit()
     conn.close()
 
-
-init_db()
-
-
-# =========================================================
-# CRIAR / ATUALIZAR ADM PRINCIPAL
-# =========================================================
 
 def configurar_admin():
 
@@ -122,19 +98,18 @@ def configurar_admin():
         LIMIT 1
     """)
 
-    admin_existente = cursor.fetchone()
+    admin = cursor.fetchone()
 
     senha_hash = generate_password_hash(ADMIN_SENHA)
 
-    criado_em = datetime.now().isoformat()
-
-    if admin_existente:
+    if admin:
 
         cursor.execute("""
             UPDATE usuarios
             SET nome = ?,
                 usuario = ?,
                 senha = ?,
+                tipo = 'admin',
                 banido = 0,
                 ban_expira = NULL
             WHERE id = ?
@@ -142,7 +117,7 @@ def configurar_admin():
             "Administrador",
             ADMIN_USUARIO,
             senha_hash,
-            admin_existente[0]
+            admin[0]
         ))
 
     else:
@@ -158,31 +133,21 @@ def configurar_admin():
                 ban_expira,
                 criado_em
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, 'admin', 0, NULL, ?)
         """, (
             "Administrador",
             ADMIN_USUARIO,
             senha_hash,
-            "admin",
-            0,
-            None,
-            criado_em
+            datetime.now().isoformat()
         ))
 
     conn.commit()
     conn.close()
 
 
-configurar_admin()
-
-
 # =========================================================
 # FUNÇÕES AUXILIARES
 # =========================================================
-
-def usuario_logado():
-    return session.get('usuario')
-
 
 def buscar_usuario(usuario):
 
@@ -203,11 +168,11 @@ def buscar_usuario(usuario):
         WHERE usuario = ?
     """, (usuario,))
 
-    resultado = cursor.fetchone()
+    dados = cursor.fetchone()
 
     conn.close()
 
-    return resultado
+    return dados
 
 
 def verificar_banimento(usuario):
@@ -215,60 +180,56 @@ def verificar_banimento(usuario):
     dados = buscar_usuario(usuario)
 
     if not dados:
-        return False
+        return False, None
 
     banido = dados[5]
     ban_expira = dados[6]
 
     if not banido:
-        return False
+        return False, None
 
     # Banimento permanente
     if not ban_expira:
-        return True
+        return True, "permanente"
 
-    # Banimento temporário
     try:
+        expiracao = datetime.fromisoformat(ban_expira)
 
-        data_expiracao = datetime.fromisoformat(
-            ban_expira
-        )
+        if datetime.now() >= expiracao:
 
-        if datetime.now() < data_expiracao:
-            return True
+            conn = conectar_banco()
+            cursor = conn.cursor()
 
-        # Banimento terminou
-        conn = conectar_banco()
-        cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE usuarios
+                SET banido = 0,
+                    ban_expira = NULL
+                WHERE usuario = ?
+            """, (usuario,))
 
-        cursor.execute("""
-            UPDATE usuarios
-            SET banido = 0,
-                ban_expira = NULL
-            WHERE usuario = ?
-        """, (usuario,))
+            conn.commit()
+            conn.close()
 
-        conn.commit()
-        conn.close()
+            return False, None
 
-        return False
+        return True, expiracao.strftime("%d/%m/%Y %H:%M")
 
     except ValueError:
 
-        return True
+        return True, "permanente"
 
 
 def exigir_login():
 
-    if 'usuario' not in session:
+    if "usuario" not in session:
         return False
 
-    usuario = session['usuario']
+    banido, _ = verificar_banimento(
+        session["usuario"]
+    )
 
-    if verificar_banimento(usuario):
-
+    if banido:
         session.clear()
-
         return False
 
     return True
@@ -276,133 +237,62 @@ def exigir_login():
 
 def exigir_admin():
 
-    if not exigir_login():
+    if "usuario" not in session:
         return False
 
-    usuario = session['usuario']
-
-    dados = buscar_usuario(usuario)
+    dados = buscar_usuario(
+        session["usuario"]
+    )
 
     if not dados:
-        session.clear()
         return False
 
-    if dados[4] != 'admin':
+    if dados[4] != "admin":
+        return False
+
+    banido, _ = verificar_banimento(
+        session["usuario"]
+    )
+
+    if banido:
+        session.clear()
         return False
 
     return True
 
 
 # =========================================================
+# INICIALIZAÇÃO DO BANCO
+# =========================================================
+
+init_db()
+configurar_admin()
+
+
+# =========================================================
 # PÁGINA PRINCIPAL
 # =========================================================
 
-@app.route('/')
-def menu_principal():
+@app.route("/")
+def index():
 
     if not exigir_login():
-        return redirect('/login')
+        return redirect("/login")
 
-    dados_usuario = buscar_usuario(
-        session['usuario']
+    dados = buscar_usuario(
+        session["usuario"]
     )
 
     eh_admin = (
-        dados_usuario
-        and dados_usuario[4] == 'admin'
+        dados
+        and dados[4] == "admin"
     )
 
     return render_template(
-        'index.html',
-        usuario=session['usuario'],
+        "index.html",
+        usuario=session["usuario"],
+        nome=dados[1] if dados else "",
         eh_admin=eh_admin
-    )
-
-
-# =========================================================
-# PAINEL ADM
-# =========================================================
-
-@app.route('/admin')
-def painel_admin():
-
-    if not exigir_admin():
-
-        if 'usuario' not in session:
-            return redirect('/login')
-
-        return (
-            "Acesso negado. Esta área é exclusiva "
-            "do administrador."
-        ), 403
-
-    conn = conectar_banco()
-    cursor = conn.cursor()
-
-    # =====================================================
-    # LISTA DE USUÁRIOS
-    # =====================================================
-
-    cursor.execute("""
-        SELECT
-            id,
-            nome,
-            usuario,
-            tipo,
-            banido,
-            ban_expira,
-            criado_em
-        FROM usuarios
-        ORDER BY id DESC
-    """)
-
-    usuarios = cursor.fetchall()
-
-    # =====================================================
-    # TOTAL DE USUÁRIOS
-    # =====================================================
-
-    cursor.execute("""
-        SELECT COUNT(*)
-        FROM usuarios
-        WHERE tipo = 'usuario'
-    """)
-
-    total_usuarios = cursor.fetchone()[0]
-
-    # =====================================================
-    # TOTAL DE BANIDOS
-    # =====================================================
-
-    cursor.execute("""
-        SELECT COUNT(*)
-        FROM usuarios
-        WHERE tipo = 'usuario'
-        AND banido = 1
-    """)
-
-    total_banidos = cursor.fetchone()[0]
-
-    # =====================================================
-    # TOTAL DE MENSAGENS
-    # =====================================================
-
-    cursor.execute("""
-        SELECT COUNT(*)
-        FROM chat
-    """)
-
-    total_mensagens = cursor.fetchone()[0]
-
-    conn.close()
-
-    return render_template(
-        'admin.html',
-        usuarios=usuarios,
-        total_usuarios=total_usuarios,
-        total_banidos=total_banidos,
-        total_mensagens=total_mensagens,
-        usuario=session['usuario']
     )
 
 
@@ -410,87 +300,53 @@ def painel_admin():
 # LOGIN
 # =========================================================
 
-@app.route('/login')
-def pagina_login():
+@app.route("/login")
+def login():
 
-    if 'usuario' in session:
+    if "usuario" in session:
 
-        if not verificar_banimento(
-            session['usuario']
-        ):
+        if exigir_login():
+            return redirect("/")
 
-            dados = buscar_usuario(
-                session['usuario']
-            )
-
-            if dados and dados[4] == 'admin':
-                return redirect('/admin')
-
-            return redirect('/')
-
-        session.clear()
-
-    return render_template('login.html')
+    return render_template("login.html")
 
 
-# =========================================================
-# CADASTRO
-# =========================================================
-
-@app.route('/cadastrar', methods=['POST'])
+@app.route("/cadastrar", methods=["POST"])
 def cadastrar():
 
     nome = request.form.get(
-        'nome',
-        ''
+        "nome",
+        ""
     ).strip()
 
     usuario = request.form.get(
-        'usuario',
-        ''
+        "usuario",
+        ""
     ).strip()
 
     senha = request.form.get(
-        'senha',
-        ''
+        "senha",
+        ""
     )
 
     if not nome or not usuario or not senha:
-        return "Preencha nome, usuário e senha."
-
-    if len(nome) < 2:
-        return "Digite um nome válido."
+        return "Preencha todos os campos.", 400
 
     if len(usuario) < 3:
-        return (
-            "O usuário precisa ter pelo menos "
-            "3 caracteres."
-        )
+        return "O nome de usuário precisa ter pelo menos 3 caracteres.", 400
 
     if len(senha) < 4:
-        return (
-            "A senha precisa ter pelo menos "
-            "4 caracteres."
-        )
+        return "A senha precisa ter pelo menos 4 caracteres.", 400
 
-    conn = conectar_banco()
-    cursor = conn.cursor()
+    existente = buscar_usuario(usuario)
 
-    cursor.execute("""
-        SELECT id
-        FROM usuarios
-        WHERE usuario = ?
-    """, (usuario,))
-
-    if cursor.fetchone():
-
-        conn.close()
-
-        return "Esse usuário já existe."
+    if existente:
+        return "Esse nome de usuário já está sendo usado.", 400
 
     senha_hash = generate_password_hash(senha)
 
-    criado_em = datetime.now().isoformat()
+    conn = conectar_banco()
+    cursor = conn.cursor()
 
     cursor.execute("""
         INSERT INTO usuarios
@@ -503,224 +359,187 @@ def cadastrar():
             ban_expira,
             criado_em
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, 'usuario', 0, NULL, ?)
     """, (
         nome,
         usuario,
         senha_hash,
-        'usuario',
-        0,
-        None,
-        criado_em
+        datetime.now().isoformat()
     ))
 
     conn.commit()
     conn.close()
 
     session.permanent = True
-    session['usuario'] = usuario
+    session["usuario"] = usuario
 
-    return redirect('/')
+    return redirect("/")
 
 
-# =========================================================
-# ENTRAR
-# =========================================================
-
-@app.route('/entrar', methods=['POST'])
+@app.route("/entrar", methods=["POST"])
 def entrar():
 
     usuario = request.form.get(
-        'usuario',
-        ''
+        "usuario",
+        ""
     ).strip()
 
     senha = request.form.get(
-        'senha',
-        ''
+        "senha",
+        ""
     )
 
-    resultado = buscar_usuario(usuario)
+    dados = buscar_usuario(usuario)
 
-    if not resultado:
-        return "Usuário ou senha incorretos."
+    if not dados:
+        return "Usuário ou senha incorretos.", 401
 
-    senha_banco = resultado[3]
-
-    if not check_password_hash(
-        senha_banco,
+    senha_correta = check_password_hash(
+        dados[3],
         senha
-    ):
-        return "Usuário ou senha incorretos."
+    )
 
-    # =====================================================
-    # VERIFICAR BANIMENTO
-    # =====================================================
+    if not senha_correta:
+        return "Usuário ou senha incorretos.", 401
 
-    if verificar_banimento(usuario):
+    banido, motivo = verificar_banimento(usuario)
 
-        dados = buscar_usuario(usuario)
+    if banido:
 
-        ban_expira = dados[6]
+        if motivo == "permanente":
+            return "Sua conta está banida permanentemente.", 403
 
-        if ban_expira:
+        return (
+            f"Sua conta está banida até {motivo}."
+        ), 403
 
-            try:
+    session.permanent = True
+    session["usuario"] = usuario
 
-                data = datetime.fromisoformat(
-                    ban_expira
-                )
-
-                restante = (
-                    data - datetime.now()
-                )
-
-                minutos = int(
-                    restante.total_seconds() / 60
-                )
-
-                return (
-                    "Sua conta está temporariamente "
-                    "banida. Tempo restante aproximado: "
-                    f"{minutos} minutos."
-                )
-
-            except ValueError:
-
-                return "Sua conta está banida."
-
-        return "Sua conta foi banida permanentemente."
-
-    # =====================================================
-    # LOGIN
-    # =====================================================
-
-    if request.form.get('lembrar'):
-        session.permanent = True
-    else:
-        session.permanent = False
-
-    session['usuario'] = resultado[2]
-
-    # ADM vai para o painel
-    if resultado[4] == 'admin':
-        return redirect('/admin')
-
-    return redirect('/')
+    return redirect("/")
 
 
-# =========================================================
-# SAIR
-# =========================================================
-
-@app.route('/logout')
+@app.route("/logout")
 def logout():
 
     session.clear()
 
-    return redirect('/login')
+    return redirect("/login")
 
 
 # =========================================================
-# BLOCO DE NOTAS
+# BLOCO / NOTAS
 # =========================================================
 
-@app.route('/bloco')
-def pagina_bloco():
+@app.route("/bloco")
+def bloco():
 
     if not exigir_login():
-        return redirect('/login')
-
-    usuario = session['usuario']
+        return redirect("/login")
 
     conn = conectar_banco()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT conteudo
+        SELECT
+            id,
+            titulo,
+            texto,
+            criado_em
         FROM notas
         WHERE usuario = ?
-    """, (usuario,))
+        ORDER BY id DESC
+    """, (
+        session["usuario"],
+    ))
 
-    resultado = cursor.fetchone()
+    notas = cursor.fetchall()
 
     conn.close()
 
-    texto_nota = (
-        resultado[0]
-        if resultado
-        else ""
-    )
-
     return render_template(
-        'bloco.html',
-        texto_nota=texto_nota,
-        usuario=usuario
+        "bloco.html",
+        notas=notas
     )
 
 
-@app.route('/salvar_nota', methods=['POST'])
-def salvar_nota():
+@app.route("/bloco/salvar", methods=["POST"])
+def salvar_bloco():
 
     if not exigir_login():
-        return redirect('/login')
+        return redirect("/login")
 
-    usuario = session['usuario']
+    titulo = request.form.get(
+        "titulo",
+        ""
+    ).strip()
 
-    texto_nota = request.form.get(
-        'conteudo_nota',
-        ''
-    )
+    texto = request.form.get(
+        "texto",
+        ""
+    ).strip()
+
+    if not texto:
+        return redirect("/bloco")
 
     conn = conectar_banco()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id
-        FROM notas
-        WHERE usuario = ?
-    """, (usuario,))
-
-    if cursor.fetchone():
-
-        cursor.execute("""
-            UPDATE notas
-            SET conteudo = ?
-            WHERE usuario = ?
-        """, (
-            texto_nota,
-            usuario
-        ))
-
-    else:
-
-        cursor.execute("""
-            INSERT INTO notas
-            (
-                usuario,
-                conteudo
-            )
-            VALUES (?, ?)
-        """, (
+        INSERT INTO notas
+        (
             usuario,
-            texto_nota
-        ))
+            titulo,
+            texto,
+            criado_em
+        )
+        VALUES (?, ?, ?, ?)
+    """, (
+        session["usuario"],
+        titulo,
+        texto,
+        datetime.now().isoformat()
+    ))
 
     conn.commit()
     conn.close()
 
-    return redirect('/bloco')
+    return redirect("/bloco")
+
+
+@app.route("/bloco/excluir/<int:id>", methods=["POST"])
+def excluir_bloco(id):
+
+    if not exigir_login():
+        return redirect("/login")
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM notas
+        WHERE id = ?
+        AND usuario = ?
+    """, (
+        id,
+        session["usuario"]
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/bloco")
 
 
 # =========================================================
 # MURAL
 # =========================================================
 
-@app.route('/mural')
-def pagina_mural():
+@app.route("/mural")
+def mural():
 
     if not exigir_login():
-        return redirect('/login')
+        return redirect("/login")
 
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -730,82 +549,63 @@ def pagina_mural():
             id,
             usuario,
             texto,
-            hora
+            criado_em
         FROM mural
         ORDER BY id DESC
     """)
 
-    recados_banco = cursor.fetchall()
+    mensagens = cursor.fetchall()
 
     conn.close()
 
-    lista_de_tarefas = [
-
-        {
-            "id": r[0],
-            "usuario": r[1],
-            "texto": r[2],
-            "hora": r[3]
-        }
-
-        for r in recados_banco
-
-    ]
-
     return render_template(
-        'mural.html',
-        tarefas=lista_de_tarefas,
-        usuario=session['usuario']
+        "mural.html",
+        mensagens=mensagens
     )
 
 
-@app.route('/adicionar_mural', methods=['POST'])
-def adicionar_mural():
+@app.route("/mural/postar", methods=["POST"])
+def postar_mural():
 
     if not exigir_login():
-        return redirect('/login')
+        return redirect("/login")
 
-    usuario = session['usuario']
-
-    texto_tarefa = request.form.get(
-        'tarefa',
-        ''
+    texto = request.form.get(
+        "texto",
+        ""
     ).strip()
 
-    if texto_tarefa:
+    if not texto:
+        return redirect("/mural")
 
-        hora_atual = datetime.now().strftime(
-            "%d/%m %H:%M"
-        )
+    conn = conectar_banco()
+    cursor = conn.cursor()
 
-        conn = conectar_banco()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            INSERT INTO mural
-            (
-                usuario,
-                texto,
-                hora
-            )
-            VALUES (?, ?, ?)
-        """, (
+    cursor.execute("""
+        INSERT INTO mural
+        (
             usuario,
-            texto_tarefa,
-            hora_atual
-        ))
+            texto,
+            criado_em
+        )
+        VALUES (?, ?, ?)
+    """, (
+        session["usuario"],
+        texto,
+        datetime.now().isoformat()
+    ))
 
-        conn.commit()
-        conn.close()
+    conn.commit()
+    conn.close()
 
-    return redirect('/mural')
+    return redirect("/mural")
 
 
-@app.route('/deletar_mural/<int:tarefa_id>')
-def deletar_mural(tarefa_id):
+@app.route("/mural/excluir/<int:id>", methods=["POST"])
+def excluir_mural(id):
 
     if not exigir_login():
-        return redirect('/login')
+        return redirect("/login")
 
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -813,32 +613,37 @@ def deletar_mural(tarefa_id):
     cursor.execute("""
         DELETE FROM mural
         WHERE id = ?
-    """, (tarefa_id,))
+        AND usuario = ?
+    """, (
+        id,
+        session["usuario"]
+    ))
 
     conn.commit()
     conn.close()
 
-    return redirect('/mural')
+    return redirect("/mural")
 
 
 # =========================================================
 # CHAT
 # =========================================================
 
-@app.route('/chat')
-def pagina_chat():
+@app.route("/chat")
+def chat():
 
     if not exigir_login():
-        return redirect('/login')
+        return redirect("/login")
 
     conn = conectar_banco()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT
+            id,
             usuario,
             mensagem,
-            hora
+            criado_em
         FROM chat
         ORDER BY id ASC
     """)
@@ -847,44 +652,39 @@ def pagina_chat():
 
     conn.close()
 
-    mensagens = [
-
-        {
-            "usuario": h[0],
-            "mensagem": h[1],
-            "hora": h[2]
-        }
-
-        for h in historico
-
-    ]
-
     return render_template(
-        'chat.html',
-        historico=mensagens,
-        usuario=session['usuario']
+        "chat.html",
+        historico=historico
     )
 
 
-@socketio.on('enviar_mensagem')
-def gerenciar_mensagem(data):
+@socketio.on("enviar_mensagem")
+def enviar_mensagem(data):
 
-    if not exigir_login():
+    if "usuario" not in session:
         return
 
-    usuario = session['usuario']
+    mensagem = ""
 
-    mensagem = data.get(
-        'mensagem',
-        ''
-    ).strip()
+    if isinstance(data, dict):
+        mensagem = str(
+            data.get("mensagem", "")
+        ).strip()
 
     if not mensagem:
         return
 
-    hora_atual = datetime.now().strftime(
-        "%H:%M"
-    )
+    if len(mensagem) > 2000:
+        mensagem = mensagem[:2000]
+
+    usuario = session["usuario"]
+
+    banido, _ = verificar_banimento(usuario)
+
+    if banido:
+        return
+
+    criado_em = datetime.now().isoformat()
 
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -894,36 +694,381 @@ def gerenciar_mensagem(data):
         (
             usuario,
             mensagem,
-            hora
+            criado_em
         )
         VALUES (?, ?, ?)
     """, (
         usuario,
         mensagem,
-        hora_atual
+        criado_em
     ))
+
+    mensagem_id = cursor.lastrowid
 
     conn.commit()
     conn.close()
 
     emit(
-        'receber_mensagem',
+        "receber_mensagem",
         {
-            'usuario': usuario,
-            'mensagem': mensagem,
-            'hora': hora_atual
+            "id": mensagem_id,
+            "usuario": usuario,
+            "mensagem": mensagem,
+            "criado_em": criado_em
         },
         broadcast=True
     )
 
 
 # =========================================================
-# INICIAR
+# ADMIN
 # =========================================================
 
-if __name__ == '__main__':
+@app.route("/admin")
+def admin():
+
+    if not exigir_admin():
+        return "Acesso negado.", 403
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            nome,
+            usuario,
+            senha,
+            tipo,
+            banido,
+            ban_expira,
+            criado_em
+        FROM usuarios
+        ORDER BY id DESC
+    """)
+
+    usuarios = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM usuarios
+        WHERE tipo = 'usuario'
+    """)
+
+    total_usuarios = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM usuarios
+        WHERE tipo = 'usuario'
+        AND banido = 1
+    """)
+
+    total_banidos = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM chat
+    """)
+
+    total_mensagens = cursor.fetchone()[0]
+
+    conn.close()
+
+    return render_template(
+        "admin.html",
+        usuarios=usuarios,
+        total_usuarios=total_usuarios,
+        total_banidos=total_banidos,
+        total_mensagens=total_mensagens
+    )
+
+
+# =========================================================
+# ADMIN - BANIR
+# =========================================================
+
+@app.route("/admin/banir", methods=["POST"])
+def admin_banir():
+
+    if not exigir_admin():
+        return "Acesso negado.", 403
+
+    usuario = request.form.get(
+        "usuario",
+        ""
+    ).strip()
+
+    duracao = request.form.get(
+        "duracao",
+        ""
+    ).strip().lower()
+
+    if not usuario:
+        return "Usuário inválido.", 400
+
+    dados = buscar_usuario(usuario)
+
+    if not dados:
+        return "Usuário não encontrado.", 404
+
+    # Não permite banir administradores
+    if dados[4] == "admin":
+        return "Não é possível banir um administrador.", 403
+
+    # Banimento permanente
+    if duracao == "p":
+
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE usuarios
+            SET banido = 1,
+                ban_expira = NULL
+            WHERE usuario = ?
+        """, (
+            usuario,
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/admin")
+
+    # Banimento temporário
+    try:
+
+        minutos = int(duracao)
+
+        if minutos <= 0:
+            return "A duração precisa ser maior que zero.", 400
+
+        expiracao = (
+            datetime.now()
+            + timedelta(minutes=minutos)
+        ).isoformat()
+
+    except ValueError:
+
+        return (
+            "Duração inválida. Use P ou um número de minutos."
+        ), 400
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE usuarios
+        SET banido = 1,
+            ban_expira = ?
+        WHERE usuario = ?
+    """, (
+        expiracao,
+        usuario
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+
+# =========================================================
+# ADMIN - DESBANIR
+# =========================================================
+
+@app.route("/admin/desbanir", methods=["POST"])
+def admin_desbanir():
+
+    if not exigir_admin():
+        return "Acesso negado.", 403
+
+    usuario = request.form.get(
+        "usuario",
+        ""
+    ).strip()
+
+    if not usuario:
+        return "Usuário inválido.", 400
+
+    dados = buscar_usuario(usuario)
+
+    if not dados:
+        return "Usuário não encontrado.", 404
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE usuarios
+        SET banido = 0,
+            ban_expira = NULL
+        WHERE usuario = ?
+    """, (
+        usuario,
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+
+# =========================================================
+# ADMIN - EDITAR USUÁRIO
+# =========================================================
+
+@app.route("/admin/editar", methods=["POST"])
+def admin_editar():
+
+    if not exigir_admin():
+        return "Acesso negado.", 403
+
+    usuario_atual = request.form.get(
+        "usuario_atual",
+        ""
+    ).strip()
+
+    novo_nome = request.form.get(
+        "nome",
+        ""
+    ).strip()
+
+    novo_usuario = request.form.get(
+        "usuario",
+        ""
+    ).strip()
+
+    if (
+        not usuario_atual
+        or not novo_nome
+        or not novo_usuario
+    ):
+        return "Preencha todos os campos.", 400
+
+    dados = buscar_usuario(
+        usuario_atual
+    )
+
+    if not dados:
+        return "Usuário não encontrado.", 404
+
+    # Não permite editar administrador
+    if dados[4] == "admin":
+        return (
+            "O administrador principal não pode "
+            "ser editado por aqui."
+        ), 403
+
+    outro_usuario = buscar_usuario(
+        novo_usuario
+    )
+
+    if (
+        outro_usuario
+        and outro_usuario[0] != dados[0]
+    ):
+        return (
+            "Esse nome de usuário já está sendo usado."
+        ), 400
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE usuarios
+        SET nome = ?,
+            usuario = ?
+        WHERE id = ?
+    """, (
+        novo_nome,
+        novo_usuario,
+        dados[0]
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+
+# =========================================================
+# ADMIN - EXCLUIR USUÁRIO
+# =========================================================
+
+@app.route("/admin/excluir", methods=["POST"])
+def admin_excluir():
+
+    if not exigir_admin():
+        return "Acesso negado.", 403
+
+    usuario = request.form.get(
+        "usuario",
+        ""
+    ).strip()
+
+    if not usuario:
+        return "Usuário inválido.", 400
+
+    dados = buscar_usuario(usuario)
+
+    if not dados:
+        return "Usuário não encontrado.", 404
+
+    # Proteção do ADM
+    if dados[4] == "admin":
+        return "Não é possível excluir um administrador.", 403
+
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    # Apaga notas
+    cursor.execute("""
+        DELETE FROM notas
+        WHERE usuario = ?
+    """, (
+        usuario,
+    ))
+
+    # Apaga posts do mural
+    cursor.execute("""
+        DELETE FROM mural
+        WHERE usuario = ?
+    """, (
+        usuario,
+    ))
+
+    # Apaga mensagens do chat
+    cursor.execute("""
+        DELETE FROM chat
+        WHERE usuario = ?
+    """, (
+        usuario,
+    ))
+
+    # Apaga conta
+    cursor.execute("""
+        DELETE FROM usuarios
+        WHERE usuario = ?
+    """, (
+        usuario,
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+
+# =========================================================
+# EXECUTAR
+# =========================================================
+
+if __name__ == "__main__":
 
     socketio.run(
         app,
-        debug=True
+        host="0.0.0.0",
+        port=5000
     )
