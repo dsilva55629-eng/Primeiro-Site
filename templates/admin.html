@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Painel ADM</title>
 
     <style>
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -28,7 +22,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: auto;
         }
 
@@ -38,15 +32,50 @@
 
         .subtitulo {
             color: #aaa;
+            margin-bottom: 25px;
+        }
+
+        /* BOTÕES DO TOPO */
+
+        .topo-botoes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             margin-bottom: 30px;
         }
 
+        .botao {
+            display: inline-block;
+            padding: 11px 17px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #252525;
+            cursor: pointer;
+        }
+
+        .botao:hover {
+            background: #383838;
+        }
+
+        .site {
+            background: #163d2a;
+            border-color: #245f40;
+        }
+
+        .sair {
+            background: #3d1919;
+            border-color: #642626;
+        }
+
+        /* CARDS */
+
         .painel {
             display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(220px, 1fr));
-
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 18px;
+            margin-bottom: 35px;
         }
 
         .card {
@@ -66,125 +95,417 @@
             font-size: 14px;
         }
 
-        .botoes {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 30px;
+        /* ÁREA DE USUÁRIOS */
+
+        .usuarios-area {
+            background: #1b1b1b;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 25px;
         }
 
-        .botao {
+        .usuarios-area h2 {
+            margin-bottom: 5px;
+        }
+
+        .descricao {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .tabela-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            text-align: left;
+            background: #252525;
+            padding: 13px;
+            border-bottom: 1px solid #444;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #333;
+        }
+
+        tr:hover {
+            background: #222;
+        }
+
+        .status {
             display: inline-block;
-            padding: 11px 17px;
-            background: #2a2a2a;
+            padding: 5px 9px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .ativo {
+            background: #153d27;
+            color: #4cff91;
+        }
+
+        .banido {
+            background: #451919;
+            color: #ff6666;
+        }
+
+        .admin {
+            background: #403313;
+            color: #ffd45c;
+        }
+
+        /* AÇÕES */
+
+        .acoes {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .acao {
+            border: none;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
             color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid #444;
+            font-size: 12px;
         }
 
-        .botao:hover {
-            background: #383838;
+        .acao:hover {
+            opacity: 0.8;
         }
 
-        .site {
-            background: #163d2a;
-            border-color: #245f40;
+        .ver {
+            background: #24517a;
         }
 
-        .sair {
-            background: #3d1919;
-            border-color: #642626;
+        .banir {
+            background: #7a2424;
         }
 
+        .desbanir {
+            background: #246b42;
+        }
+
+        .editar {
+            background: #67551f;
+        }
+
+        .vazio {
+            color: #aaa;
+            padding: 20px 0;
+        }
+
+        /* RESPONSIVO */
+
+        @media (max-width: 700px) {
+            body {
+                padding: 15px;
+            }
+
+            .usuarios-area {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+        }
     </style>
-
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>
-            🛠️ Painel Administrativo
-        </h1>
+    <h1>🛠️ Painel Administrativo</h1>
 
-        <p class="subtitulo">
-            Área exclusiva do administrador
-        </p>
+    <p class="subtitulo">
+        Área exclusiva do administrador
+    </p>
 
 
-        <div class="painel">
+    <!-- BOTÕES -->
 
-            <div class="card">
+    <div class="topo-botoes">
 
-                <h2>👤 Usuários</h2>
+        <a href="/" class="botao site">
+            🌐 Voltar ao site
+        </a>
 
-                <p>
-                    Gerenciar contas e perfis.
-                </p>
+        <a href="/admin" class="botao">
+            🛠️ Painel ADM
+        </a>
 
-            </div>
+        <a href="/logout" class="botao sair">
+            🚪 Sair
+        </a>
 
-
-            <div class="card">
-
-                <h2>🚫 Banimentos</h2>
-
-                <p>
-                    Banir, desbanir e controlar contas.
-                </p>
-
-            </div>
+    </div>
 
 
-            <div class="card">
+    <!-- RESUMO -->
 
-                <h2>💬 Mensagens</h2>
+    <div class="painel">
 
-                <p>
-                    Gerenciar mensagens do chat.
-                </p>
+        <div class="card">
+            <h2>👤 Usuários</h2>
 
-            </div>
-
-
-            <div class="card">
-
-                <h2>⚙️ Configurações</h2>
-
-                <p>
-                    Controles gerais do site.
-                </p>
-
-            </div>
-
+            <p>
+                Total de usuários:
+                <strong>{{ total_usuarios }}</strong>
+            </p>
         </div>
 
 
-        <div class="botoes">
+        <div class="card">
+            <h2>🚫 Banimentos</h2>
 
-            <a
-                href="/"
-                class="botao site">
-
-                🌐 Ir para o site
-
-            </a>
+            <p>
+                Contas banidas:
+                <strong>{{ total_banidos }}</strong>
+            </p>
+        </div>
 
 
-            <a
-                href="/logout"
-                class="botao sair">
+        <div class="card">
+            <h2>💬 Mensagens</h2>
 
-                🚪 Sair
+            <p>
+                Total de mensagens:
+                <strong>{{ total_mensagens }}</strong>
+            </p>
+        </div>
 
-            </a>
+
+        <div class="card">
+            <h2>⚙️ Configurações</h2>
+
+            <p>
+                Controles gerais do site.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- USUÁRIOS -->
+
+    <div class="usuarios-area">
+
+        <h2>👤 Gerenciamento de usuários</h2>
+
+        <p class="descricao">
+            Aqui você poderá visualizar e administrar as contas cadastradas.
+        </p>
+
+
+        <div class="tabela-container">
+
+            {% if usuarios %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Usuário</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for usuario in usuarios %}
+
+                    <tr>
+
+                        <td>
+                            {{ usuario[0] }}
+                        </td>
+
+                        <td>
+                            {{ usuario[1] }}
+                        </td>
+
+                        <td>
+                            {{ usuario[2] }}
+                        </td>
+
+
+                        <td>
+
+                            {% if usuario[4] == 'admin' %}
+
+                                <span class="status admin">
+                                    ADM
+                                </span>
+
+                            {% else %}
+
+                                Usuário
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if usuario[5] == 'banido' %}
+
+                                <span class="status banido">
+                                    Banido
+                                </span>
+
+                            {% else %}
+
+                                <span class="status ativo">
+                                    Ativo
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <div class="acoes">
+
+                                <button
+                                    class="acao ver"
+                                    onclick="verUsuario('{{ usuario[2] }}')">
+                                    👁️ Ver
+                                </button>
+
+
+                                {% if usuario[4] != 'admin' %}
+
+                                    {% if usuario[5] == 'banido' %}
+
+                                        <button
+                                            class="acao desbanir"
+                                            onclick="desbanirUsuario('{{ usuario[2] }}')">
+                                            ✅ Desbanir
+                                        </button>
+
+                                    {% else %}
+
+                                        <button
+                                            class="acao banir"
+                                            onclick="banirUsuario('{{ usuario[2] }}')">
+                                            🚫 Banir
+                                        </button>
+
+                                    {% endif %}
+
+                                    <button
+                                        class="acao editar"
+                                        onclick="editarUsuario('{{ usuario[2] }}')">
+                                        ✏️ Editar
+                                    </button>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+                <p class="vazio">
+                    Nenhum usuário encontrado.
+                </p>
+
+            {% endif %}
 
         </div>
 
     </div>
 
-</body>
+</div>
 
+
+<script>
+
+    function verUsuario(usuario) {
+
+        alert(
+            "Usuário selecionado: " + usuario +
+            "\n\nA área de informações detalhadas será adicionada depois."
+        );
+
+    }
+
+
+    function banirUsuario(usuario) {
+
+        const confirmar = confirm(
+            "Tem certeza que deseja banir o usuário @" + usuario + "?"
+        );
+
+        if (!confirmar) {
+            return;
+        }
+
+        alert(
+            "O sistema de banimento será conectado ao banco de dados na próxima etapa."
+        );
+
+    }
+
+
+    function desbanirUsuario(usuario) {
+
+        const confirmar = confirm(
+            "Deseja desbanir o usuário @" + usuario + "?"
+        );
+
+        if (!confirmar) {
+            return;
+        }
+
+        alert(
+            "O sistema de desbanimento será conectado ao banco de dados na próxima etapa."
+        );
+
+    }
+
+
+    function editarUsuario(usuario) {
+
+        alert(
+            "Edição do usuário @" + usuario +
+            " será adicionada na próxima etapa."
+        );
+
+    }
+
+</script>
+
+</body>
 </html>
