@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Painel do Davi - Menu</title>
 
     <style>
@@ -136,6 +138,10 @@
             font-size: 14px;
             font-weight: bold;
         }
+
+        .admin-btn {
+            border-left-color: #ffaa00;
+        }
     </style>
 </head>
 
@@ -145,7 +151,10 @@
 
         <div>
             👤 Perfil: <strong>{{ usuario }}</strong> |
-            <a href="/logout" class="logout">Sair</a>
+
+            <a href="/logout" class="logout">
+                Sair
+            </a>
         </div>
 
         <div style="display: flex; gap: 15px; align-items: center;">
@@ -154,71 +163,135 @@
                 class="btn-tema"
                 id="toggleTema"
                 onclick="alternarTema()">
+
                 ☀️ Modo Claro
+
             </button>
 
-            <div class="relogio" id="relogio-digital">
+            <div
+                class="relogio"
+                id="relogio-digital">
+
                 00/00/0000 - 00:00:00
+
             </div>
 
         </div>
 
     </div>
 
+
     <div class="container-menu">
 
         <div class="assinatura">
+
             By Davi
-            <span class="nave">🚀</span>
+
+            <span class="nave">
+                🚀
+            </span>
+
         </div>
+
 
         <div class="botoes-menu">
 
-            <a href="/bloco" class="btn-link">
-                📝 Abrir Bloco de Notas
+            {% if eh_admin %}
+
+            <a
+                href="/admin"
+                class="btn-link admin-btn">
+
+                🛠️ Painel Administrativo
+
             </a>
 
-            <a href="/mural" class="btn-link">
-                💬 Abrir Mural de Recados
+            {% endif %}
+
+
+            <a
+                href="/bloco"
+                class="btn-link">
+
+                📝 Abrir Bloco de Notas
+
             </a>
+
+
+            <a
+                href="/mural"
+                class="btn-link">
+
+                💬 Abrir Mural de Recados
+
+            </a>
+
 
             <a
                 href="/chat"
                 class="btn-link"
                 style="border-left-color: #ff00ff;">
+
                 💬 Abrir Chat Online
+
             </a>
 
         </div>
 
     </div>
 
+
     <script>
 
-        // Relógio
         function atualizarRelogio() {
 
             const agora = new Date();
 
-            document.getElementById('relogio-digital').innerText =
-                `${String(agora.getDate()).padStart(2, '0')}/` +
-                `${String(agora.getMonth() + 1).padStart(2, '0')}/` +
+            document.getElementById(
+                'relogio-digital'
+            ).innerText =
+
+                `${String(
+                    agora.getDate()
+                ).padStart(2, '0')}/` +
+
+                `${String(
+                    agora.getMonth() + 1
+                ).padStart(2, '0')}/` +
+
                 `${agora.getFullYear()} - ` +
-                `${String(agora.getHours()).padStart(2, '0')}:` +
-                `${String(agora.getMinutes()).padStart(2, '0')}:` +
-                `${String(agora.getSeconds()).padStart(2, '0')}`;
+
+                `${String(
+                    agora.getHours()
+                ).padStart(2, '0')}:` +
+
+                `${String(
+                    agora.getMinutes()
+                ).padStart(2, '0')}:` +
+
+                `${String(
+                    agora.getSeconds()
+                ).padStart(2, '0')}`;
         }
 
-        setInterval(atualizarRelogio, 1000);
+        setInterval(
+            atualizarRelogio,
+            1000
+        );
+
         atualizarRelogio();
 
 
-        // Aplica o tema salvo
         function aplicarTema() {
 
-            const tema = localStorage.getItem("tema") || "dark";
+            const tema =
+                localStorage.getItem("tema")
+                || "dark";
 
-            const botao = document.getElementById("toggleTema");
+            const botao =
+                document.getElementById(
+                    "toggleTema"
+                );
 
             if (tema === "light") {
 
@@ -227,7 +300,8 @@
                     "light"
                 );
 
-                botao.innerText = "🌙 Modo Escuro";
+                botao.innerText =
+                    "🌙 Modo Escuro";
 
             } else {
 
@@ -235,34 +309,41 @@
                     "data-theme"
                 );
 
-                botao.innerText = "☀️ Modo Claro";
+                botao.innerText =
+                    "☀️ Modo Claro";
             }
         }
 
 
-        // Troca o tema
         function alternarTema() {
 
             const temaAtual =
-                localStorage.getItem("tema") || "dark";
+                localStorage.getItem("tema")
+                || "dark";
 
             if (temaAtual === "light") {
 
-                localStorage.setItem("tema", "dark");
+                localStorage.setItem(
+                    "tema",
+                    "dark"
+                );
 
             } else {
 
-                localStorage.setItem("tema", "light");
+                localStorage.setItem(
+                    "tema",
+                    "light"
+                );
             }
 
             aplicarTema();
         }
 
 
-        // Aplica o tema quando a página abre
         aplicarTema();
 
     </script>
 
 </body>
+
 </html>
