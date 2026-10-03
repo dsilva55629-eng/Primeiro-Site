@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login - Primeiro Site</title>
 
     <style>
+
         :root {
             --fundo: #0f1115;
             --caixa: #181b21;
@@ -15,8 +17,8 @@
             --borda: #303641;
             --botao: #5865f2;
             --botao-hover: #4752c4;
-            --erro: #ff6b6b;
         }
+
 
         [data-theme="light"] {
             --fundo: #f2f3f5;
@@ -27,12 +29,13 @@
             --borda: #d5d8de;
             --botao: #5865f2;
             --botao-hover: #4752c4;
-            --erro: #d93030;
         }
+
 
         * {
             box-sizing: border-box;
         }
+
 
         body {
             margin: 0;
@@ -42,95 +45,150 @@
             align-items: center;
             justify-content: center;
 
+            padding: 20px;
+
             font-family: Arial, sans-serif;
 
             background: var(--fundo);
             color: var(--texto);
 
-            transition: background 0.2s, color 0.2s;
+            transition:
+                background 0.2s,
+                color 0.2s;
         }
+
+
+        /* =================================================
+           CONTAINER
+           ================================================= */
 
         .container {
             width: 100%;
             max-width: 430px;
-            padding: 20px;
         }
+
 
         .caixa {
+            width: 100%;
+
             background: var(--caixa);
+
             border: 1px solid var(--borda);
             border-radius: 18px;
+
             padding: 30px;
 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.25);
         }
+
+
+        /* =================================================
+           TÍTULO
+           ================================================= */
 
         h1 {
             text-align: center;
+
             margin: 0 0 8px;
+
             font-size: 28px;
         }
 
+
         .subtitulo {
             text-align: center;
+
             color: var(--texto-secundario);
+
             margin-bottom: 28px;
         }
+
+
+        /* =================================================
+           CAMPOS
+           ================================================= */
 
         .campo {
             margin-bottom: 18px;
         }
 
+
         label {
             display: block;
+
             margin-bottom: 7px;
+
             font-size: 14px;
             font-weight: bold;
         }
 
+
         input {
             width: 100%;
+
             padding: 13px;
 
             border-radius: 10px;
+
             border: 1px solid var(--borda);
 
             background: var(--caixa-secundaria);
             color: var(--texto);
 
             outline: none;
+
             font-size: 15px;
         }
+
 
         input:focus {
             border-color: var(--botao);
         }
 
+
+        /* =================================================
+           LEMBRAR
+           ================================================= */
+
         .lembrar {
             display: flex;
+
             align-items: center;
+
             gap: 8px;
 
             margin: 4px 0 20px;
 
             color: var(--texto-secundario);
+
             font-size: 14px;
             font-weight: normal;
         }
 
+
         .lembrar input {
             width: auto;
+
             cursor: pointer;
         }
 
+
+        /* =================================================
+           BOTÕES
+           ================================================= */
+
         button {
             width: 100%;
+
             padding: 13px;
 
             border: none;
+
             border-radius: 10px;
 
             background: var(--botao);
+
             color: white;
 
             font-size: 15px;
@@ -138,167 +196,325 @@
 
             cursor: pointer;
 
-            transition: background 0.2s;
+            transition:
+                background 0.2s,
+                transform 0.1s;
         }
+
 
         button:hover {
             background: var(--botao-hover);
         }
 
-        .separador {
-            display: flex;
-            align-items: center;
-            gap: 12px;
 
-            margin: 25px 0;
-
-            color: var(--texto-secundario);
-            font-size: 13px;
+        button:active {
+            transform: scale(0.98);
         }
 
-        .separador::before,
-        .separador::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: var(--borda);
-        }
 
-        .cadastro {
+        /* =================================================
+           TROCA LOGIN / CADASTRO
+           ================================================= */
+
+        .troca-tela {
             text-align: center;
+
+            margin-top: 25px;
         }
 
-        .cadastro p {
+
+        .troca-tela p {
+            margin: 0;
+
             color: var(--texto-secundario);
+
             font-size: 14px;
-            margin-bottom: 12px;
         }
 
-        .botao-cadastro {
-            background: var(--caixa-secundaria);
-            border: 1px solid var(--borda);
-            color: var(--texto);
+
+        .link {
+            display: inline-block;
+
+            margin-top: 8px;
+
+            color: var(--botao);
+
+            font-size: 14px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            text-decoration: none;
         }
 
-        .botao-cadastro:hover {
-            background: var(--borda);
+
+        .link:hover {
+            text-decoration: underline;
         }
+
+
+        /* =================================================
+           CADASTRO
+           ================================================= */
+
+        #telaCadastro {
+            display: none;
+        }
+
+
+        .senha-info {
+            color: var(--texto-secundario);
+
+            font-size: 12px;
+
+            margin-top: 5px;
+        }
+
+
+        /* =================================================
+           BOTÃO DE TEMA
+           ================================================= */
 
         .tema {
             position: fixed;
+
             top: 18px;
             right: 18px;
 
+            z-index: 1000;
+
             width: auto;
+
             padding: 9px 13px;
 
             background: var(--caixa);
+
             color: var(--texto);
 
             border: 1px solid var(--borda);
+
             border-radius: 10px;
 
             font-size: 13px;
+
+            white-space: nowrap;
         }
+
 
         .tema:hover {
             background: var(--caixa-secundaria);
         }
 
-        .senha-info {
-            color: var(--texto-secundario);
-            font-size: 12px;
-            margin-top: 5px;
+
+        /* =================================================
+           CELULAR
+           ================================================= */
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 15px;
+            }
+
+
+            .container {
+                max-width: 100%;
+            }
+
+
+            .caixa {
+                padding: 24px 20px;
+
+                border-radius: 15px;
+            }
+
+
+            h1 {
+                font-size: 25px;
+            }
+
+
+            .subtitulo {
+                margin-bottom: 24px;
+            }
+
+
+            .tema {
+                top: 12px;
+                right: 12px;
+
+                padding: 8px 10px;
+
+                font-size: 12px;
+            }
+
         }
+
     </style>
 </head>
 
+
 <body>
 
-    <button class="tema" id="toggleTema" onclick="alternarTema()">
+
+    <!-- BOTÃO DE TEMA -->
+
+    <button
+        type="button"
+        class="tema"
+        id="toggleTema"
+        onclick="alternarTema()"
+    >
         ☀️ Modo Claro
     </button>
+
+
 
     <div class="container">
 
         <div class="caixa">
 
-            <h1>Primeiro Site</h1>
 
-            <div class="subtitulo">
-                Entre na sua conta
-            </div>
+            <!-- =================================================
+                 TELA DE LOGIN
+                 ================================================= -->
+
+            <div id="telaLogin">
+
+                <h1>
+                    Primeiro Site
+                </h1>
 
 
-            <!-- LOGIN -->
-
-            <form action="/entrar" method="POST">
-
-                <div class="campo">
-                    <label for="usuario">Usuário</label>
-
-                    <input
-                        type="text"
-                        id="usuario"
-                        name="usuario"
-                        placeholder="Digite seu usuário"
-                        autocomplete="username"
-                        required
-                    >
+                <div class="subtitulo">
+                    Entre na sua conta
                 </div>
 
 
-                <div class="campo">
-                    <label for="senha">Senha</label>
+                <form
+                    action="/entrar"
+                    method="POST"
+                >
 
-                    <input
-                        type="password"
-                        id="senha"
-                        name="senha"
-                        placeholder="Digite sua senha"
-                        autocomplete="current-password"
-                        required
+
+                    <div class="campo">
+
+                        <label for="usuario">
+                            Usuário
+                        </label>
+
+
+                        <input
+                            type="text"
+                            id="usuario"
+                            name="usuario"
+                            placeholder="Digite seu usuário"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="campo">
+
+                        <label for="senha">
+                            Senha
+                        </label>
+
+
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            placeholder="Digite sua senha"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <label class="lembrar">
+
+                        <input
+                            type="checkbox"
+                            name="lembrar"
+                            id="lembrar"
+                        >
+
+                        <span>
+                            Lembrar de mim
+                        </span>
+
+                    </label>
+
+
+
+                    <button type="submit">
+                        Entrar
+                    </button>
+
+
+                </form>
+
+
+
+                <!-- IR PARA CADASTRO -->
+
+                <div class="troca-tela">
+
+                    <p>
+                        Ainda não tem uma conta?
+                    </p>
+
+
+                    <a
+                        class="link"
+                        onclick="mostrarCadastro()"
                     >
+                        Crie aqui
+                    </a>
+
                 </div>
 
-
-                <label class="lembrar">
-                    <input
-                        type="checkbox"
-                        name="lembrar"
-                        id="lembrar"
-                    >
-
-                    <span>Lembrar de mim</span>
-                </label>
-
-
-                <button type="submit">
-                    Entrar
-                </button>
-
-            </form>
-
-
-            <div class="separador">
-                ou
             </div>
 
 
-            <!-- CADASTRO -->
 
-            <div class="cadastro">
+            <!-- =================================================
+                 TELA DE CADASTRO
+                 ================================================= -->
 
-                <p>
-                    Ainda não tem uma conta?
-                </p>
+            <div id="telaCadastro">
 
-                <form action="/cadastrar" method="POST">
+                <h1>
+                    Criar conta
+                </h1>
+
+
+                <div class="subtitulo">
+                    Crie sua conta no Primeiro Site
+                </div>
+
+
+
+                <form
+                    action="/cadastrar"
+                    method="POST"
+                >
+
 
                     <!-- NOME -->
 
                     <div class="campo">
-                        <label for="nome">Seu nome</label>
+
+                        <label for="nome">
+                            Seu nome
+                        </label>
+
 
                         <input
                             type="text"
@@ -309,13 +525,19 @@
                             maxlength="100"
                             required
                         >
+
                     </div>
+
 
 
                     <!-- USUÁRIO -->
 
                     <div class="campo">
-                        <label for="novo_usuario">Novo usuário</label>
+
+                        <label for="novo_usuario">
+                            Usuário
+                        </label>
+
 
                         <input
                             type="text"
@@ -326,13 +548,19 @@
                             maxlength="30"
                             required
                         >
+
                     </div>
+
 
 
                     <!-- SENHA -->
 
                     <div class="campo">
-                        <label for="nova_senha">Nova senha</label>
+
+                        <label for="nova_senha">
+                            Senha
+                        </label>
+
 
                         <input
                             type="password"
@@ -344,37 +572,107 @@
                             required
                         >
 
+
                         <div class="senha-info">
                             A senha precisa ter pelo menos 4 caracteres.
                         </div>
+
                     </div>
 
 
-                    <button
-                        type="submit"
-                        class="botao-cadastro"
-                    >
+
+                    <button type="submit">
                         Criar conta
                     </button>
 
+
                 </form>
 
+
+
+                <!-- VOLTAR PARA LOGIN -->
+
+                <div class="troca-tela">
+
+                    <p>
+                        Já tem uma conta?
+                    </p>
+
+
+                    <a
+                        class="link"
+                        onclick="mostrarLogin()"
+                    >
+                        Entre aqui
+                    </a>
+
+                </div>
+
             </div>
+
 
         </div>
 
     </div>
 
 
+
     <script>
+
+
+        /* =================================================
+           TROCAR PARA CADASTRO
+           ================================================= */
+
+        function mostrarCadastro() {
+
+            document.getElementById(
+                "telaLogin"
+            ).style.display = "none";
+
+
+            document.getElementById(
+                "telaCadastro"
+            ).style.display = "block";
+
+        }
+
+
+
+        /* =================================================
+           VOLTAR PARA LOGIN
+           ================================================= */
+
+        function mostrarLogin() {
+
+            document.getElementById(
+                "telaCadastro"
+            ).style.display = "none";
+
+
+            document.getElementById(
+                "telaLogin"
+            ).style.display = "block";
+
+        }
+
+
+
+        /* =================================================
+           TEMA
+           ================================================= */
 
         function aplicarTema() {
 
             const tema =
-                localStorage.getItem("tema") || "dark";
+                localStorage.getItem("tema")
+                || "dark";
+
 
             const botao =
-                document.getElementById("toggleTema");
+                document.getElementById(
+                    "toggleTema"
+                );
 
 
             if (tema === "light") {
@@ -384,25 +682,33 @@
                     "light"
                 );
 
+
                 botao.innerText =
                     "🌙 Modo Escuro";
 
-            } else {
+            }
+
+            else {
 
                 document.documentElement.removeAttribute(
                     "data-theme"
                 );
 
+
                 botao.innerText =
                     "☀️ Modo Claro";
+
             }
+
         }
+
 
 
         function alternarTema() {
 
             const temaAtual =
-                localStorage.getItem("tema") || "dark";
+                localStorage.getItem("tema")
+                || "dark";
 
 
             if (temaAtual === "light") {
@@ -412,22 +718,29 @@
                     "dark"
                 );
 
-            } else {
+            }
+
+            else {
 
                 localStorage.setItem(
                     "tema",
                     "light"
                 );
+
             }
 
 
             aplicarTema();
+
         }
+
 
 
         aplicarTema();
 
+
     </script>
+
 
 </body>
 </html>
