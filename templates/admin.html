@@ -35,8 +35,6 @@
             margin-bottom: 25px;
         }
 
-        /* BOTÕES DO TOPO */
-
         .topo-botoes {
             display: flex;
             gap: 10px;
@@ -69,8 +67,6 @@
             border-color: #642626;
         }
 
-        /* CARDS */
-
         .painel {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -94,8 +90,6 @@
             color: #aaa;
             font-size: 14px;
         }
-
-        /* ÁREA DE USUÁRIOS */
 
         .usuarios-area {
             background: #1b1b1b;
@@ -121,7 +115,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 700px;
+            min-width: 750px;
         }
 
         th {
@@ -163,8 +157,6 @@
             color: #ffd45c;
         }
 
-        /* AÇÕES */
-
         .acoes {
             display: flex;
             gap: 7px;
@@ -205,7 +197,52 @@
             padding: 20px 0;
         }
 
-        /* RESPONSIVO */
+        /* MODAL */
+
+        .modal-fundo {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 500px;
+            background: #1b1b1b;
+            border: 1px solid #444;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+        }
+
+        .detalhe {
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .detalhe strong {
+            color: #aaa;
+        }
+
+        .fechar {
+            margin-top: 20px;
+            width: 100%;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
 
         @media (max-width: 700px) {
             body {
@@ -233,9 +270,6 @@
         Área exclusiva do administrador
     </p>
 
-
-    <!-- BOTÕES -->
-
     <div class="topo-botoes">
 
         <a href="/" class="botao site">
@@ -253,43 +287,34 @@
     </div>
 
 
-    <!-- RESUMO -->
-
     <div class="painel">
 
         <div class="card">
             <h2>👤 Usuários</h2>
-
             <p>
                 Total de usuários:
                 <strong>{{ total_usuarios }}</strong>
             </p>
         </div>
 
-
         <div class="card">
             <h2>🚫 Banimentos</h2>
-
             <p>
                 Contas banidas:
                 <strong>{{ total_banidos }}</strong>
             </p>
         </div>
 
-
         <div class="card">
             <h2>💬 Mensagens</h2>
-
             <p>
                 Total de mensagens:
                 <strong>{{ total_mensagens }}</strong>
             </p>
         </div>
 
-
         <div class="card">
             <h2>⚙️ Configurações</h2>
-
             <p>
                 Controles gerais do site.
             </p>
@@ -298,16 +323,13 @@
     </div>
 
 
-    <!-- USUÁRIOS -->
-
     <div class="usuarios-area">
 
         <h2>👤 Gerenciamento de usuários</h2>
 
         <p class="descricao">
-            Aqui você poderá visualizar e administrar as contas cadastradas.
+            Visualize e administre as contas cadastradas.
         </p>
-
 
         <div class="tabela-container">
 
@@ -316,7 +338,6 @@
             <table>
 
                 <thead>
-
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
@@ -325,32 +346,23 @@
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
-
                 </thead>
-
 
                 <tbody>
 
-                    {% for usuario in usuarios %}
+                {% for u in usuarios %}
 
                     <tr>
 
-                        <td>
-                            {{ usuario[0] }}
-                        </td>
+                        <td>{{ u[0] }}</td>
 
-                        <td>
-                            {{ usuario[1] }}
-                        </td>
+                        <td>{{ u[1] }}</td>
 
-                        <td>
-                            {{ usuario[2] }}
-                        </td>
-
+                        <td>@{{ u[2] }}</td>
 
                         <td>
 
-                            {% if usuario[4] == 'admin' %}
+                            {% if u[3] == 'admin' %}
 
                                 <span class="status admin">
                                     ADM
@@ -364,10 +376,9 @@
 
                         </td>
 
-
                         <td>
 
-                            {% if usuario[5] == 'banido' %}
+                            {% if u[4] == 1 %}
 
                                 <span class="status banido">
                                     Banido
@@ -383,41 +394,67 @@
 
                         </td>
 
-
                         <td>
 
                             <div class="acoes">
 
                                 <button
                                     class="acao ver"
-                                    onclick="verUsuario('{{ usuario[2] }}')">
+                                    onclick="verUsuario(
+                                        '{{ u[0] }}',
+                                        '{{ u[1]|e }}',
+                                        '{{ u[2]|e }}',
+                                        '{{ u[3] }}',
+                                        '{{ u[6]|e }}',
+                                        '{{ u[4] }}',
+                                        '{{ u[5] or '' }}'
+                                    )">
                                     👁️ Ver
                                 </button>
 
 
-                                {% if usuario[4] != 'admin' %}
+                                {% if u[3] != 'admin' %}
 
-                                    {% if usuario[5] == 'banido' %}
+                                    {% if u[4] == 1 %}
 
-                                        <button
-                                            class="acao desbanir"
-                                            onclick="desbanirUsuario('{{ usuario[2] }}')">
-                                            ✅ Desbanir
-                                        </button>
+                                        <form
+                                            method="POST"
+                                            action="/admin/desbanir"
+                                            style="display:inline;">
+
+                                            <input
+                                                type="hidden"
+                                                name="usuario"
+                                                value="{{ u[2] }}">
+
+                                            <button
+                                                type="submit"
+                                                class="acao desbanir"
+                                                onclick="return confirm(
+                                                    'Deseja desbanir @{{ u[2] }}?'
+                                                )">
+                                                ✅ Desbanir
+                                            </button>
+
+                                        </form>
 
                                     {% else %}
 
                                         <button
                                             class="acao banir"
-                                            onclick="banirUsuario('{{ usuario[2] }}')">
+                                            onclick="banirUsuario('{{ u[2]|e }}')">
                                             🚫 Banir
                                         </button>
 
                                     {% endif %}
 
+
                                     <button
                                         class="acao editar"
-                                        onclick="editarUsuario('{{ usuario[2] }}')">
+                                        onclick="editarUsuario(
+                                            '{{ u[2]|e }}',
+                                            '{{ u[1]|e }}'
+                                        )">
                                         ✏️ Editar
                                     </button>
 
@@ -429,7 +466,7 @@
 
                     </tr>
 
-                    {% endfor %}
+                {% endfor %}
 
                 </tbody>
 
@@ -450,60 +487,205 @@
 </div>
 
 
+<!-- MODAL DE DETALHES -->
+
+<div
+    class="modal-fundo"
+    id="modalFundo"
+    onclick="fecharModal(event)">
+
+    <div
+        class="modal"
+        onclick="event.stopPropagation()">
+
+        <h2>👤 Detalhes da conta</h2>
+
+        <div class="detalhe">
+            <strong>ID:</strong>
+            <span id="detalheId"></span>
+        </div>
+
+        <div class="detalhe">
+            <strong>Nome:</strong>
+            <span id="detalheNome"></span>
+        </div>
+
+        <div class="detalhe">
+            <strong>Usuário:</strong>
+            <span id="detalheUsuario"></span>
+        </div>
+
+        <div class="detalhe">
+            <strong>Tipo:</strong>
+            <span id="detalheTipo"></span>
+        </div>
+
+        <div class="detalhe">
+            <strong>Criado em:</strong>
+            <span id="detalheCriado"></span>
+        </div>
+
+        <div class="detalhe">
+            <strong>Status:</strong>
+            <span id="detalheStatus"></span>
+        </div>
+
+        <div class="detalhe">
+            <strong>Expiração do banimento:</strong>
+            <span id="detalheExpira"></span>
+        </div>
+
+        <button
+            class="fechar"
+            onclick="fecharModal()">
+            Fechar
+        </button>
+
+    </div>
+
+</div>
+
+
 <script>
 
-    function verUsuario(usuario) {
+function verUsuario(
+    id,
+    nome,
+    usuario,
+    tipo,
+    criado,
+    banido,
+    expira
+) {
 
-        alert(
-            "Usuário selecionado: " + usuario +
-            "\n\nA área de informações detalhadas será adicionada depois."
-        );
+    document.getElementById("detalheId").innerText = id;
+    document.getElementById("detalheNome").innerText = nome;
+    document.getElementById("detalheUsuario").innerText = "@" + usuario;
 
+    document.getElementById("detalheTipo").innerText =
+        tipo === "admin" ? "Administrador" : "Usuário";
+
+    document.getElementById("detalheCriado").innerText =
+        criado || "Não informado";
+
+    document.getElementById("detalheStatus").innerText =
+        banido === "1" ? "Banido" : "Ativo";
+
+    document.getElementById("detalheExpira").innerText =
+        expira || "Não se aplica";
+
+    document.getElementById("modalFundo").style.display = "flex";
+}
+
+
+function fecharModal() {
+
+    document.getElementById("modalFundo").style.display = "none";
+
+}
+
+
+function banirUsuario(usuario) {
+
+    const escolha = prompt(
+        "Digite:\n\n" +
+        "P = banimento permanente\n" +
+        "ou\n" +
+        "um número de minutos para banimento temporário.\n\n" +
+        "Exemplo: 60"
+    );
+
+    if (escolha === null) {
+        return;
     }
 
+    const valor = escolha.trim().toLowerCase();
 
-    function banirUsuario(usuario) {
-
-        const confirmar = confirm(
-            "Tem certeza que deseja banir o usuário @" + usuario + "?"
-        );
-
-        if (!confirmar) {
-            return;
-        }
-
-        alert(
-            "O sistema de banimento será conectado ao banco de dados na próxima etapa."
-        );
-
+    if (!valor) {
+        return;
     }
 
+    const formulario = document.createElement("form");
 
-    function desbanirUsuario(usuario) {
+    formulario.method = "POST";
+    formulario.action = "/admin/banir";
 
-        const confirmar = confirm(
-            "Deseja desbanir o usuário @" + usuario + "?"
-        );
+    const campoUsuario = document.createElement("input");
+    campoUsuario.type = "hidden";
+    campoUsuario.name = "usuario";
+    campoUsuario.value = usuario;
 
-        if (!confirmar) {
-            return;
-        }
+    const campoDuracao = document.createElement("input");
+    campoDuracao.type = "hidden";
+    campoDuracao.name = "duracao";
+    campoDuracao.value = valor;
 
-        alert(
-            "O sistema de desbanimento será conectado ao banco de dados na próxima etapa."
-        );
+    formulario.appendChild(campoUsuario);
+    formulario.appendChild(campoDuracao);
 
+    document.body.appendChild(formulario);
+
+    formulario.submit();
+}
+
+
+function editarUsuario(usuario, nomeAtual) {
+
+    const novoNome = prompt(
+        "Novo nome:",
+        nomeAtual
+    );
+
+    if (novoNome === null) {
+        return;
     }
 
+    const novoUsuario = prompt(
+        "Novo nome de usuário:",
+        usuario
+    );
 
-    function editarUsuario(usuario) {
+    if (novoUsuario === null) {
+        return;
+    }
+
+    if (!novoNome.trim() || !novoUsuario.trim()) {
 
         alert(
-            "Edição do usuário @" + usuario +
-            " será adicionada na próxima etapa."
+            "Nome e usuário não podem ficar vazios."
         );
 
+        return;
     }
+
+    const formulario = document.createElement("form");
+
+    formulario.method = "POST";
+    formulario.action = "/admin/editar";
+
+    const campoAtual = document.createElement("input");
+    campoAtual.type = "hidden";
+    campoAtual.name = "usuario_atual";
+    campoAtual.value = usuario;
+
+    const campoNome = document.createElement("input");
+    campoNome.type = "hidden";
+    campoNome.name = "nome";
+    campoNome.value = novoNome.trim();
+
+    const campoUsuario = document.createElement("input");
+    campoUsuario.type = "hidden";
+    campoUsuario.name = "usuario";
+    campoUsuario.value = novoUsuario.trim();
+
+    formulario.appendChild(campoAtual);
+    formulario.appendChild(campoNome);
+    formulario.appendChild(campoUsuario);
+
+    document.body.appendChild(formulario);
+
+    formulario.submit();
+}
 
 </script>
 
