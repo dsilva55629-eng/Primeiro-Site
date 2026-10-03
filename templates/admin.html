@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,7 +116,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 750px;
+            min-width: 850px;
         }
 
         th {
@@ -195,6 +196,11 @@
         .vazio {
             color: #aaa;
             padding: 20px 0;
+        }
+
+        .contador {
+            color: #4cff91;
+            font-weight: bold;
         }
 
         /* MODAL */
@@ -292,8 +298,8 @@
         <div class="card">
             <h2>👤 Usuários</h2>
             <p>
-                Total de usuários:
-                <strong>{{ total_usuarios }}</strong>
+                Total de contas:
+                <strong class="contador">{{ total_usuarios }}</strong>
             </p>
         </div>
 
@@ -301,7 +307,7 @@
             <h2>🚫 Banimentos</h2>
             <p>
                 Contas banidas:
-                <strong>{{ total_banidos }}</strong>
+                <strong class="contador">{{ total_banidos }}</strong>
             </p>
         </div>
 
@@ -309,7 +315,7 @@
             <h2>💬 Mensagens</h2>
             <p>
                 Total de mensagens:
-                <strong>{{ total_mensagens }}</strong>
+                <strong class="contador">{{ total_mensagens }}</strong>
             </p>
         </div>
 
@@ -325,10 +331,11 @@
 
     <div class="usuarios-area">
 
-        <h2>👤 Gerenciamento de usuários</h2>
+        <h2>👤 Todas as contas</h2>
 
         <p class="descricao">
-            Visualize e administre as contas cadastradas.
+            Aqui aparecem todas as contas cadastradas no banco de dados,
+            independentemente de estarem online ou não.
         </p>
 
         <div class="tabela-container">
@@ -338,14 +345,17 @@
             <table>
 
                 <thead>
+
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
                         <th>Usuário</th>
                         <th>Tipo</th>
                         <th>Status</th>
+                        <th>Criada em</th>
                         <th>Ações</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
@@ -354,15 +364,28 @@
 
                     <tr>
 
-                        <td>{{ u[0] }}</td>
+                        <!-- ID -->
+                        <td>
+                            {{ u[0] }}
+                        </td>
 
-                        <td>{{ u[1] }}</td>
 
-                        <td>@{{ u[2] }}</td>
+                        <!-- NOME -->
+                        <td>
+                            {{ u[1] }}
+                        </td>
 
+
+                        <!-- USUÁRIO -->
+                        <td>
+                            @{{ u[2] }}
+                        </td>
+
+
+                        <!-- TIPO -->
                         <td>
 
-                            {% if u[3] == 'admin' %}
+                            {% if u[4] == 'admin' %}
 
                                 <span class="status admin">
                                     ADM
@@ -376,9 +399,11 @@
 
                         </td>
 
+
+                        <!-- STATUS -->
                         <td>
 
-                            {% if u[4] == 1 %}
+                            {% if u[5] == 1 %}
 
                                 <span class="status banido">
                                     Banido
@@ -394,6 +419,14 @@
 
                         </td>
 
+
+                        <!-- DATA -->
+                        <td>
+                            {{ u[7] }}
+                        </td>
+
+
+                        <!-- AÇÕES -->
                         <td>
 
                             <div class="acoes">
@@ -404,18 +437,20 @@
                                         '{{ u[0] }}',
                                         '{{ u[1]|e }}',
                                         '{{ u[2]|e }}',
-                                        '{{ u[3] }}',
-                                        '{{ u[6]|e }}',
-                                        '{{ u[4] }}',
-                                        '{{ u[5] or '' }}'
+                                        '{{ u[4]|e }}',
+                                        '{{ u[7]|e }}',
+                                        '{{ u[5] }}',
+                                        '{{ u[6] or '' }}'
                                     )">
+
                                     👁️ Ver
+
                                 </button>
 
 
-                                {% if u[3] != 'admin' %}
+                                {% if u[4] != 'admin' %}
 
-                                    {% if u[4] == 1 %}
+                                    {% if u[5] == 1 %}
 
                                         <form
                                             method="POST"
@@ -433,7 +468,9 @@
                                                 onclick="return confirm(
                                                     'Deseja desbanir @{{ u[2] }}?'
                                                 )">
+
                                                 ✅ Desbanir
+
                                             </button>
 
                                         </form>
@@ -443,7 +480,9 @@
                                         <button
                                             class="acao banir"
                                             onclick="banirUsuario('{{ u[2]|e }}')">
+
                                             🚫 Banir
+
                                         </button>
 
                                     {% endif %}
@@ -455,7 +494,9 @@
                                             '{{ u[2]|e }}',
                                             '{{ u[1]|e }}'
                                         )">
+
                                         ✏️ Editar
+
                                     </button>
 
                                 {% endif %}
@@ -475,7 +516,7 @@
             {% else %}
 
                 <p class="vazio">
-                    Nenhum usuário encontrado.
+                    Nenhuma conta cadastrada.
                 </p>
 
             {% endif %}
@@ -487,7 +528,7 @@
 </div>
 
 
-<!-- MODAL DE DETALHES -->
+<!-- MODAL -->
 
 <div
     class="modal-fundo"
@@ -538,7 +579,9 @@
         <button
             class="fechar"
             onclick="fecharModal()">
+
             Fechar
+
         </button>
 
     </div>
@@ -558,30 +601,47 @@ function verUsuario(
     expira
 ) {
 
-    document.getElementById("detalheId").innerText = id;
-    document.getElementById("detalheNome").innerText = nome;
-    document.getElementById("detalheUsuario").innerText = "@" + usuario;
+    document.getElementById("detalheId").innerText =
+        id;
+
+    document.getElementById("detalheNome").innerText =
+        nome;
+
+    document.getElementById("detalheUsuario").innerText =
+        "@" + usuario;
 
     document.getElementById("detalheTipo").innerText =
-        tipo === "admin" ? "Administrador" : "Usuário";
+        tipo === "admin"
+            ? "Administrador"
+            : "Usuário";
 
     document.getElementById("detalheCriado").innerText =
         criado || "Não informado";
 
     document.getElementById("detalheStatus").innerText =
-        banido === "1" ? "Banido" : "Ativo";
+        banido === "1"
+            ? "Banido"
+            : "Ativo";
 
     document.getElementById("detalheExpira").innerText =
         expira || "Não se aplica";
 
-    document.getElementById("modalFundo").style.display = "flex";
+    document.getElementById("modalFundo").style.display =
+        "flex";
 }
 
 
-function fecharModal() {
+function fecharModal(event) {
 
-    document.getElementById("modalFundo").style.display = "none";
+    if (
+        event &&
+        event.target !== document.getElementById("modalFundo")
+    ) {
+        return;
+    }
 
+    document.getElementById("modalFundo").style.display =
+        "none";
 }
 
 
@@ -599,26 +659,35 @@ function banirUsuario(usuario) {
         return;
     }
 
-    const valor = escolha.trim().toLowerCase();
+    const valor =
+        escolha.trim().toLowerCase();
 
     if (!valor) {
         return;
     }
 
-    const formulario = document.createElement("form");
+    const formulario =
+        document.createElement("form");
 
     formulario.method = "POST";
     formulario.action = "/admin/banir";
 
-    const campoUsuario = document.createElement("input");
+
+    const campoUsuario =
+        document.createElement("input");
+
     campoUsuario.type = "hidden";
     campoUsuario.name = "usuario";
     campoUsuario.value = usuario;
 
-    const campoDuracao = document.createElement("input");
+
+    const campoDuracao =
+        document.createElement("input");
+
     campoDuracao.type = "hidden";
     campoDuracao.name = "duracao";
     campoDuracao.value = valor;
+
 
     formulario.appendChild(campoUsuario);
     formulario.appendChild(campoDuracao);
@@ -629,7 +698,10 @@ function banirUsuario(usuario) {
 }
 
 
-function editarUsuario(usuario, nomeAtual) {
+function editarUsuario(
+    usuario,
+    nomeAtual
+) {
 
     const novoNome = prompt(
         "Novo nome:",
@@ -640,6 +712,7 @@ function editarUsuario(usuario, nomeAtual) {
         return;
     }
 
+
     const novoUsuario = prompt(
         "Novo nome de usuário:",
         usuario
@@ -649,7 +722,11 @@ function editarUsuario(usuario, nomeAtual) {
         return;
     }
 
-    if (!novoNome.trim() || !novoUsuario.trim()) {
+
+    if (
+        !novoNome.trim() ||
+        !novoUsuario.trim()
+    ) {
 
         alert(
             "Nome e usuário não podem ficar vazios."
@@ -658,25 +735,39 @@ function editarUsuario(usuario, nomeAtual) {
         return;
     }
 
-    const formulario = document.createElement("form");
+
+    const formulario =
+        document.createElement("form");
 
     formulario.method = "POST";
     formulario.action = "/admin/editar";
 
-    const campoAtual = document.createElement("input");
+
+    const campoAtual =
+        document.createElement("input");
+
     campoAtual.type = "hidden";
     campoAtual.name = "usuario_atual";
     campoAtual.value = usuario;
 
-    const campoNome = document.createElement("input");
+
+    const campoNome =
+        document.createElement("input");
+
     campoNome.type = "hidden";
     campoNome.name = "nome";
-    campoNome.value = novoNome.trim();
+    campoNome.value =
+        novoNome.trim();
 
-    const campoUsuario = document.createElement("input");
+
+    const campoUsuario =
+        document.createElement("input");
+
     campoUsuario.type = "hidden";
     campoUsuario.name = "usuario";
-    campoUsuario.value = novoUsuario.trim();
+    campoUsuario.value =
+        novoUsuario.trim();
+
 
     formulario.appendChild(campoAtual);
     formulario.appendChild(campoNome);
