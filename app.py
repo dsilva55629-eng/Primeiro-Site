@@ -28,7 +28,6 @@ socketio = SocketIO(
 # =========================================================
 
 ADMIN_USUARIO = "adm_master_47"
-
 ADMIN_SENHA = "R7!mQ2#vL9@xK4"
 
 
@@ -37,7 +36,6 @@ ADMIN_SENHA = "R7!mQ2#vL9@xK4"
 # =========================================================
 
 def conectar_banco():
-
     return sqlite3.connect("banco.db")
 
 
@@ -53,19 +51,12 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             nome TEXT NOT NULL,
-
             usuario TEXT UNIQUE NOT NULL,
-
             senha TEXT NOT NULL,
-
             tipo TEXT NOT NULL DEFAULT 'usuario',
-
             banido INTEGER NOT NULL DEFAULT 0,
-
             ban_expira TEXT,
-
             criado_em TEXT NOT NULL
         )
     """)
@@ -77,9 +68,7 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS notas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             usuario TEXT,
-
             conteudo TEXT
         )
     """)
@@ -91,11 +80,8 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS mural (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             usuario TEXT,
-
             texto TEXT,
-
             hora TEXT
         )
     """)
@@ -107,11 +93,8 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS chat (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             usuario TEXT,
-
             mensagem TEXT,
-
             hora TEXT
         )
     """)
@@ -132,7 +115,6 @@ def configurar_admin():
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    # Procura algum administrador existente
     cursor.execute("""
         SELECT id
         FROM usuarios
@@ -142,15 +124,12 @@ def configurar_admin():
 
     admin_existente = cursor.fetchone()
 
-    senha_hash = generate_password_hash(
-        ADMIN_SENHA
-    )
+    senha_hash = generate_password_hash(ADMIN_SENHA)
 
     criado_em = datetime.now().isoformat()
 
     if admin_existente:
 
-        # Atualiza o ADM existente
         cursor.execute("""
             UPDATE usuarios
             SET nome = ?,
@@ -168,7 +147,6 @@ def configurar_admin():
 
     else:
 
-        # Cria o ADM caso ainda não exista
         cursor.execute("""
             INSERT INTO usuarios
             (
@@ -203,7 +181,6 @@ configurar_admin()
 # =========================================================
 
 def usuario_logado():
-
     return session.get('usuario')
 
 
@@ -300,7 +277,6 @@ def exigir_login():
 def exigir_admin():
 
     if not exigir_login():
-
         return False
 
     usuario = session['usuario']
@@ -308,14 +284,10 @@ def exigir_admin():
     dados = buscar_usuario(usuario)
 
     if not dados:
-
         session.clear()
-
         return False
 
-    # posição 4 = tipo
     if dados[4] != 'admin':
-
         return False
 
     return True
@@ -331,9 +303,19 @@ def menu_principal():
     if not exigir_login():
         return redirect('/login')
 
+    dados_usuario = buscar_usuario(
+        session['usuario']
+    )
+
+    eh_admin = (
+        dados_usuario
+        and dados_usuario[4] == 'admin'
+    )
+
     return render_template(
         'index.html',
-        usuario=session['usuario']
+        usuario=session['usuario'],
+        eh_admin=eh_admin
     )
 
 
@@ -349,12 +331,18 @@ def painel_admin():
         if 'usuario' not in session:
             return redirect('/login')
 
-        return "Acesso negado. Esta área é exclusiva do administrador.", 403
+        return (
+            "Acesso negado. Esta área é exclusiva "
+            "do administrador."
+        ), 403
 
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    # Lista de usuários
+    # =====================================================
+    # LISTA DE USUÁRIOS
+    # =====================================================
+
     cursor.execute("""
         SELECT
             id,
@@ -370,7 +358,10 @@ def painel_admin():
 
     usuarios = cursor.fetchall()
 
-    # Quantidade de usuários
+    # =====================================================
+    # TOTAL DE USUÁRIOS
+    # =====================================================
+
     cursor.execute("""
         SELECT COUNT(*)
         FROM usuarios
@@ -379,7 +370,23 @@ def painel_admin():
 
     total_usuarios = cursor.fetchone()[0]
 
-    # Quantidade de mensagens
+    # =====================================================
+    # TOTAL DE BANIDOS
+    # =====================================================
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM usuarios
+        WHERE tipo = 'usuario'
+        AND banido = 1
+    """)
+
+    total_banidos = cursor.fetchone()[0]
+
+    # =====================================================
+    # TOTAL DE MENSAGENS
+    # =====================================================
+
     cursor.execute("""
         SELECT COUNT(*)
         FROM chat
@@ -393,6 +400,7 @@ def painel_admin():
         'admin.html',
         usuarios=usuarios,
         total_usuarios=total_usuarios,
+        total_banidos=total_banidos,
         total_mensagens=total_mensagens,
         usuario=session['usuario']
     )
@@ -407,14 +415,15 @@ def pagina_login():
 
     if 'usuario' in session:
 
-        if not verificar_banimento(session['usuario']):
+        if not verificar_banimento(
+            session['usuario']
+        ):
 
             dados = buscar_usuario(
                 session['usuario']
             )
 
             if dados and dados[4] == 'admin':
-
                 return redirect('/admin')
 
             return redirect('/')
@@ -447,20 +456,22 @@ def cadastrar():
     )
 
     if not nome or not usuario or not senha:
-
         return "Preencha nome, usuário e senha."
 
     if len(nome) < 2:
-
         return "Digite um nome válido."
 
     if len(usuario) < 3:
-
-        return "O usuário precisa ter pelo menos 3 caracteres."
+        return (
+            "O usuário precisa ter pelo menos "
+            "3 caracteres."
+        )
 
     if len(senha) < 4:
-
-        return "A senha precisa ter pelo menos 4 caracteres."
+        return (
+            "A senha precisa ter pelo menos "
+            "4 caracteres."
+        )
 
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -477,9 +488,7 @@ def cadastrar():
 
         return "Esse usuário já existe."
 
-    senha_hash = generate_password_hash(
-        senha
-    )
+    senha_hash = generate_password_hash(senha)
 
     criado_em = datetime.now().isoformat()
 
@@ -509,7 +518,6 @@ def cadastrar():
     conn.close()
 
     session.permanent = True
-
     session['usuario'] = usuario
 
     return redirect('/')
@@ -535,7 +543,6 @@ def entrar():
     resultado = buscar_usuario(usuario)
 
     if not resultado:
-
         return "Usuário ou senha incorretos."
 
     senha_banco = resultado[3]
@@ -544,10 +551,12 @@ def entrar():
         senha_banco,
         senha
     ):
-
         return "Usuário ou senha incorretos."
 
-    # Verificar banimento
+    # =====================================================
+    # VERIFICAR BANIMENTO
+    # =====================================================
+
     if verificar_banimento(usuario):
 
         dados = buscar_usuario(usuario)
@@ -562,15 +571,18 @@ def entrar():
                     ban_expira
                 )
 
-                restante = data - datetime.now()
+                restante = (
+                    data - datetime.now()
+                )
 
                 minutos = int(
                     restante.total_seconds() / 60
                 )
 
                 return (
-                    "Sua conta está temporariamente banida. "
-                    f"Tempo restante aproximado: {minutos} minutos."
+                    "Sua conta está temporariamente "
+                    "banida. Tempo restante aproximado: "
+                    f"{minutos} minutos."
                 )
 
             except ValueError:
@@ -579,20 +591,19 @@ def entrar():
 
         return "Sua conta foi banida permanentemente."
 
-    # Login
+    # =====================================================
+    # LOGIN
+    # =====================================================
+
     if request.form.get('lembrar'):
-
         session.permanent = True
-
     else:
-
         session.permanent = False
 
     session['usuario'] = resultado[2]
 
-    # ADM vai direto para o painel
+    # ADM vai para o painel
     if resultado[4] == 'admin':
-
         return redirect('/admin')
 
     return redirect('/')
