@@ -21,6 +21,7 @@ header,.topline,.exercise-head{display:flex;align-items:center;justify-content:s
 header{margin-bottom:25px}
 .brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800}
 .logo{display:grid;place-items:center;background:var(--green);color:#17200e;width:42px;height:42px;border-radius:14px;font-size:28px;font-weight:900}
+.logo svg{width:28px;height:28px;display:block}
 .muted,.label{color:var(--muted);font-size:13px}
 h1{font-size:clamp(27px,6vw,36px);margin:0 0 8px;letter-spacing:-1px}
 h2{font-size:19px;margin:0}
@@ -59,16 +60,33 @@ nav button.active{background:var(--green);color:#17200e;border-color:var(--green
 <body>
 <main class="app">
 <header>
-  <div class="brand"><div class="logo" aria-hidden="true">↗</div><div>Meu Progresso<div class="muted">Sua evolução, no seu ritmo</div></div></div>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M7 35 L17 25 L24 30 L38 13"
+          stroke="currentColor" stroke-width="3.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M28 13 H38 V23"
+          stroke="currentColor" stroke-width="3.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>Meu Progresso<div class="muted">Sua evolução, no seu ritmo</div></div>
+  </div>
   <button id="theme">☀️ Tema</button>
 </header>
-<div class="actions" style="margin:-12px 0 18px"><button id="installApp" class="primary hidden">Instalar aplicativo</button></div>
+
+<div class="actions" style="margin:-12px 0 18px">
+  <button id="installApp" class="primary hidden">Instalar aplicativo</button>
+</div>
+
 <nav>
   <button class="active" data-page="home">Início</button>
   <button data-page="calendarPage">Calendário</button>
   <button data-page="exercisePage">Exercícios</button>
   <button data-page="statsPage">Estatísticas</button>
 </nav>
+
 <section class="page active" id="home">
   <div class="intro"><h1>Vamos evoluir.</h1><p class="muted" id="todayText"></p></div>
   <div class="grid">
@@ -77,25 +95,42 @@ nav button.active{background:var(--green);color:#17200e;border-color:var(--green
     <div class="card"><div class="label">Meus exercícios</div><div class="number" id="exerciseCount">0</div><div class="muted">metas cadastradas</div></div>
     <div class="card"><div class="label">Progresso diário</div><div class="number" id="dailyPercent">—</div><div class="bar"><div class="fill" id="dailyBar"></div></div><div class="muted" id="dailyStatus">Sem registros</div></div>
   </div>
-  <section class="section card"><div class="topline"><h2>Seu dia</h2><button data-go="calendarPage">Ver calendário →</button></div><p class="muted" id="selectedText"></p><div class="list" id="homeList"></div></section>
+  <section class="section card">
+    <div class="topline"><h2>Seu dia</h2><button data-go="calendarPage">Ver calendário →</button></div>
+    <p class="muted" id="selectedText"></p>
+    <div class="list" id="homeList"></div>
+  </section>
 </section>
+
 <section class="page" id="calendarPage">
   <div class="intro"><h1>Calendário</h1><p class="muted">Escolha uma data para registrar ou consultar seu progresso.</p></div>
   <section class="card">
     <div class="topline"><button id="prevMonth">←</button><h2 id="monthTitle"></h2><button id="nextMonth">→</button></div>
-    <div class="weekdays"><div class="weekday">Seg</div><div class="weekday">Ter</div><div class="weekday">Qua</div><div class="weekday">Qui</div><div class="weekday">Sex</div><div class="weekday">Sáb</div><div class="weekday">Dom</div></div>
+    <div class="weekdays">
+      <div class="weekday">Seg</div><div class="weekday">Ter</div><div class="weekday">Qua</div><div class="weekday">Qui</div><div class="weekday">Sex</div><div class="weekday">Sáb</div><div class="weekday">Dom</div>
+    </div>
     <div class="calendar" id="calendar"></div>
     <p class="muted">Vermelho: abaixo da meta · Verde: atingida · Dourado: superada.</p>
   </section>
-  <section class="section card"><div class="topline"><h2 id="chosenTitle"></h2><button id="goToday">Hoje</button></div><div class="list" id="calendarList"></div></section>
+  <section class="section card">
+    <div class="topline"><h2 id="chosenTitle"></h2><button id="goToday">Hoje</button></div>
+    <div class="list" id="calendarList"></div>
+  </section>
 </section>
+
 <section class="page" id="exercisePage">
   <div class="intro"><h1>Exercícios</h1><p class="muted">Escolha a unidade adequada para cada exercício.</p></div>
   <section class="card">
     <h2 id="formTitle">Adicionar exercício</h2>
     <form id="exerciseForm" class="form">
       <label>Nome do exercício<input id="exerciseName" maxlength="60" placeholder="Ex.: Flexões ou Prancha" required></label>
-      <label>Unidade de medida<select id="unit"><option value="reps">Repetições</option><option value="seconds">Segundos</option><option value="minutes">Minutos</option></select></label>
+      <label>Unidade de medida
+        <select id="unit">
+          <option value="reps">Repetições</option>
+          <option value="seconds">Segundos</option>
+          <option value="minutes">Minutos</option>
+        </select>
+      </label>
       <div class="form-grid">
         <label>Meta diária<input id="goalDaily" type="number" min="0.01" step="any" placeholder="50" required></label>
         <label>Meta semanal<input id="goalWeekly" type="number" min="0.01" step="any" placeholder="350" required></label>
@@ -105,11 +140,15 @@ nav button.active{background:var(--green);color:#17200e;border-color:var(--green
         <label>Quantidade por série<input id="perSet" type="number" min="0.01" step="any" placeholder="10" required></label>
       </div>
       <p class="muted">Exemplo: para prancha, escolha minutos e defina uma meta de 2 por dia. Você pode registrar valores menores ou maiores que a meta.</p>
-      <div class="actions"><button class="primary" id="submitExercise">Adicionar exercício</button><button type="button" id="cancelEdit" class="hidden">Cancelar</button></div>
+      <div class="actions">
+        <button class="primary" id="submitExercise">Adicionar exercício</button>
+        <button type="button" id="cancelEdit" class="hidden">Cancelar</button>
+      </div>
     </form>
   </section>
   <section class="section card"><h2>Meus exercícios</h2><div class="list" id="exerciseList"></div></section>
 </section>
+
 <section class="page" id="statsPage">
   <div class="intro"><h1>Estatísticas</h1><p class="muted">Acompanhe sua evolução por exercício e unidade.</p></div>
   <div class="grid">
@@ -121,33 +160,75 @@ nav button.active{background:var(--green);color:#17200e;border-color:var(--green
   <section class="section card"><h2>Resumo por exercício</h2><div class="list" id="statsList"></div></section>
 </section>
 </main>
+
 <script>
 const $=id=>document.getElementById(id);
 const STORAGE="meuProgresso_v1";
-const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+
+const today=()=>{
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
+
 let selectedDate=today(),shownMonth=new Date(),editingId=null,dark=true;
-let saved={};try{saved=JSON.parse(localStorage.getItem(STORAGE)||"{}")}catch{}
+let saved={};
+try{saved=JSON.parse(localStorage.getItem(STORAGE)||"{}")}catch{}
 let exercises=Array.isArray(saved.exercises)?saved.exercises.map(ex=>({...ex,unit:ex.unit||"reps"})):[];
 let records=saved.records&&typeof saved.records==="object"?saved.records:{};
-function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({exercises,records}))}catch{alert("Não foi possível salvar os dados neste navegador.")}}
+
+function persist(){
+  try{localStorage.setItem(STORAGE,JSON.stringify({exercises,records}))}
+  catch{alert("Não foi possível salvar os dados neste navegador.")}
+}
+
 const fmt=n=>Number(n||0).toLocaleString("pt-BR",{maximumFractionDigits:2});
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const unitName=u=>({reps:"repetições",seconds:"segundos",minutes:"minutos"})[u]||"repetições";
 const shortUnit=u=>({reps:"quant.",seconds:"s",minutes:"min"})[u]||"quant.";
-function br(date){const[y,m,d]=date.split("-").map(Number);return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`}
-function longDate(date){const[y,m,d]=date.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+
+function br(date){
+  const[y,m,d]=date.split("-").map(Number);
+  return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`;
+}
+function longDate(date){
+  const[y,m,d]=date.split("-").map(Number);
+  return new Date(y,m-1,d).toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
 function rec(id,date=selectedDate){return records[date]?.[id]||{quantity:null,sets:null}}
-function status(ex,r){if(r.quantity===null||r.quantity===undefined)return "pending";if(Number(r.quantity)<Number(ex.daily))return "low";if(Number(r.quantity)===Number(ex.daily))return "done";return "over"}
+
+function status(ex,r){
+  if(r.quantity===null||r.quantity===undefined)return "pending";
+  if(Number(r.quantity)<Number(ex.daily))return "low";
+  if(Number(r.quantity)===Number(ex.daily))return "done";
+  return "over";
+}
 function statusText(s){return({pending:"Pendente",low:"Abaixo da meta",done:"Meta atingida",over:"Acima da meta"})[s]}
 function colorClass(ex,r){return({pending:"",low:"red",done:"green",over:"gold"})[status(ex,r)]}
 function display(n,u){return `${fmt(n)} ${shortUnit(u)}`}
+
 function totals(date){
-  let goal=0,done=0,count=0;const byUnit={reps:{goal:0,done:0},seconds:{goal:0,done:0},minutes:{goal:0,done:0}};
-  exercises.forEach(ex=>{const u=ex.unit||"reps",r=rec(ex.id,date);byUnit[u].goal+=Number(ex.daily)||0;goal+=Number(ex.daily)||0;if(r.quantity!==null&&r.quantity!==undefined){byUnit[u].done+=Number(r.quantity)||0;done+=Number(r.quantity)||0;count++}});
+  let goal=0,done=0,count=0;
+  const byUnit={reps:{goal:0,done:0},seconds:{goal:0,done:0},minutes:{goal:0,done:0}};
+  exercises.forEach(ex=>{
+    const u=ex.unit||"reps",r=rec(ex.id,date);
+    byUnit[u].goal+=Number(ex.daily)||0;
+    goal+=Number(ex.daily)||0;
+    if(r.quantity!==null&&r.quantity!==undefined){
+      byUnit[u].done+=Number(r.quantity)||0;
+      done+=Number(r.quantity)||0;
+      count++;
+    }
+  });
   return{goal,done,count,byUnit};
 }
-function summaryUnits(obj,key){return Object.entries(obj).filter(([u,v])=>v[key]>0).map(([u,v])=>display(v[key],u)).join(" · ")||"0"}
+
+function summaryUnits(obj,key){
+  return Object.entries(obj).filter(([u,v])=>v[key]>0).map(([u,v])=>display(v[key],u)).join(" · ")||"0";
+}
+
 function exerciseCard(ex,date){
-  const r=rec(ex.id,date),s=status(ex,r),u=ex.unit||"reps",step=u==="minutes"?"0.01":"1";
+  const r=rec(ex.id,date),s=status(ex,r),u=ex.unit||"reps";
+  const step=u==="minutes"?"0.01":"1";
   const label=u==="reps"?"Adicionar repetições":u==="seconds"?"Adicionar segundos":"Adicionar minutos";
   return `<article class="exercise">
     <div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Meta diária: ${display(ex.daily,u)} · Semanal: ${display(ex.weekly,u)}</p><p>${fmt(ex.sets)} séries de ${display(ex.perSet,u)}</p><p><b>Total acumulado hoje: ${display(r.quantity||0,u)} · ${fmt(r.sets||0)} séries</b></p></div><strong class="${colorClass(ex,r)}">${statusText(s)}</strong></div>
@@ -158,102 +239,247 @@ function exerciseCard(ex,date){
     <div class="actions"><button class="primary" data-save="${ex.id}" data-date="${date}">Adicionar treino</button><button data-clear="${ex.id}" data-date="${date}">Zerar dia</button></div>
   </article>`;
 }
+
 function renderHome(){
   const t=totals(today()),pct=t.goal?Math.round(t.done/t.goal*100):0;
-  $("todayText").textContent=longDate(today());$("selectedText").textContent=longDate(selectedDate);
-  $("dailyGoal").textContent=summaryUnits(t.byUnit,"goal");$("dailyDone").textContent=summaryUnits(t.byUnit,"done");
-  $("exerciseCount").textContent=fmt(exercises.length);$("dailyPercent").textContent=t.count?pct+"%":"—";
-  $("dailyBar").style.width=Math.min(pct,100)+"%";$("dailyStatus").textContent=t.count?`${t.count} de ${exercises.length} exercícios registrados`:"Ainda sem registros";
+  $("todayText").textContent=longDate(today());
+  $("selectedText").textContent=longDate(selectedDate);
+  $("dailyGoal").textContent=summaryUnits(t.byUnit,"goal");
+  $("dailyDone").textContent=summaryUnits(t.byUnit,"done");
+  $("exerciseCount").textContent=fmt(exercises.length);
+  $("dailyPercent").textContent=t.count?pct+"%":"—";
+  $("dailyBar").style.width=Math.min(pct,100)+"%";
+  $("dailyStatus").textContent=t.count?`${t.count} de ${exercises.length} exercícios registrados`:"Ainda sem registros";
   $("homeList").innerHTML=exercises.length?exercises.map(ex=>exerciseCard(ex,selectedDate)).join(""):'<div class="empty">Nenhum exercício cadastrado.<br>Entre em <b>Exercícios</b> para adicionar suas metas.</div>';
 }
+
 function renderCalendar(){
   const y=shownMonth.getFullYear(),m=shownMonth.getMonth();
   $("monthTitle").textContent=`${["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][m]} ${y}`;
   let html="",offset=(new Date(y,m,1).getDay()+6)%7,count=new Date(y,m+1,0).getDate();
   for(let i=0;i<offset;i++)html+='<div class="day blank"></div>';
   for(let d=1;d<=count;d++){
-    const date=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`,t=totals(date);let cls="day";
-    if(date===selectedDate)cls+=" selected";if(date===today())cls+=" today";
-    if(t.count){const hasLow=exercises.some(ex=>{const r=rec(ex.id,date);return r.quantity!==null&&Number(r.quantity)<Number(ex.daily)});const allDone=exercises.every(ex=>{const r=rec(ex.id,date);return r.quantity!==null&&Number(r.quantity)>=Number(ex.daily)});cls+=" "+(hasLow?"low":allDone?"done":"over")}
+    const date=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`,t=totals(date);
+    let cls="day";
+    if(date===selectedDate)cls+=" selected";
+    if(date===today())cls+=" today";
+    if(t.count){
+      const hasLow=exercises.some(ex=>{const r=rec(ex.id,date);return r.quantity!==null&&Number(r.quantity)<Number(ex.daily)});
+      const allDone=exercises.every(ex=>{const r=rec(ex.id,date);return r.quantity!==null&&Number(r.quantity)>=Number(ex.daily)});
+      cls+=" "+(hasLow?"low":allDone?"done":"over");
+    }
     html+=`<button class="${cls}" data-date="${date}">${d}<span class="dot"></span></button>`;
   }
-  $("calendar").innerHTML=html;$("chosenTitle").textContent=br(selectedDate);
+  $("calendar").innerHTML=html;
+  $("chosenTitle").textContent=br(selectedDate);
   $("calendarList").innerHTML=exercises.length?exercises.map(ex=>exerciseCard(ex,selectedDate)).join(""):'<div class="empty">Cadastre seus exercícios para começar.</div>';
 }
+
 function renderExercises(){
   $("exerciseList").innerHTML=exercises.length?exercises.map(ex=>`<article class="exercise"><div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Meta diária: ${display(ex.daily,ex.unit||"reps")} · Semanal: ${display(ex.weekly,ex.unit||"reps")}</p><p>${fmt(ex.sets)} séries de ${display(ex.perSet,ex.unit||"reps")}</p></div></div><div class="actions"><button data-edit="${ex.id}">Editar</button><button data-delete="${ex.id}">Excluir</button></div></article>`).join(""):'<div class="empty">Nenhum exercício cadastrado.</div>';
 }
-function weekStart(date){const[y,m,d]=date.split("-").map(Number),dt=new Date(y,m-1,d);dt.setDate(dt.getDate()-(dt.getDay()+6)%7);return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`}
+
+function weekStart(date){
+  const[y,m,d]=date.split("-").map(Number),dt=new Date(y,m-1,d);
+  dt.setDate(dt.getDate()-(dt.getDay()+6)%7);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+}
+
 function weekTotals(ex){
-  const start=weekStart(today()),[y,m,d]=start.split("-").map(Number);let done=0;
-  for(let i=0;i<7;i++){const dt=new Date(y,m-1,d+i),date=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`,r=rec(ex.id,date);if(r.quantity!==null&&r.quantity!==undefined)done+=Number(r.quantity)||0}
+  const start=weekStart(today()),[y,m,d]=start.split("-").map(Number);
+  let done=0;
+  for(let i=0;i<7;i++){
+    const dt=new Date(y,m-1,d+i),date=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`,r=rec(ex.id,date);
+    if(r.quantity!==null&&r.quantity!==undefined)done+=Number(r.quantity)||0;
+  }
   return{done,goal:Number(ex.weekly)||0};
 }
+
 function renderStats(){
-  let days=new Set(),met=0;const totalsByUnit={reps:0,seconds:0,minutes:0};
+  let days=new Set(),met=0;
+  const totalsByUnit={reps:0,seconds:0,minutes:0};
   Object.entries(records).forEach(([date,list])=>Object.entries(list).forEach(([id,r])=>{
-    if(r.quantity!==null&&r.quantity!==undefined){days.add(date);const ex=exercises.find(e=>e.id===Number(id));if(ex){const u=ex.unit||"reps";totalsByUnit[u]+=Number(r.quantity)||0;if(Number(r.quantity)>=Number(ex.daily))met++}}
+    if(r.quantity!==null&&r.quantity!==undefined){
+      days.add(date);
+      const ex=exercises.find(e=>e.id===Number(id));
+      if(ex){
+        const u=ex.unit||"reps";
+        totalsByUnit[u]+=Number(r.quantity)||0;
+        if(Number(r.quantity)>=Number(ex.daily))met++;
+      }
+    }
   }));
   $("totalAll").textContent=Object.entries(totalsByUnit).filter(([u,n])=>n>0).map(([u,n])=>display(n,u)).join(" · ")||"0";
-  $("daysAll").textContent=fmt(days.size);$("goalsAll").textContent=fmt(met);
-  let pctSum=0,pctCount=0;exercises.forEach(ex=>{const w=weekTotals(ex);if(w.goal>0){pctSum+=Math.min(w.done/w.goal,1)*100;pctCount++}});
-  const pct=pctCount?Math.round(pctSum/pctCount):0;$("weeklyPercent").textContent=pct+"%";$("weeklyBar").style.width=Math.min(pct,100)+"%";$("weeklyText").textContent="Média do progresso das metas semanais";
+  $("daysAll").textContent=fmt(days.size);
+  $("goalsAll").textContent=fmt(met);
+  let pctSum=0,pctCount=0;
+  exercises.forEach(ex=>{const w=weekTotals(ex);if(w.goal>0){pctSum+=Math.min(w.done/w.goal,1)*100;pctCount++}});
+  const pct=pctCount?Math.round(pctSum/pctCount):0;
+  $("weeklyPercent").textContent=pct+"%";
+  $("weeklyBar").style.width=Math.min(pct,100)+"%";
+  $("weeklyText").textContent="Média do progresso das metas semanais";
   $("statsList").innerHTML=exercises.length?exercises.map(ex=>{
-    let all=0;Object.values(records).forEach(list=>{const r=list[ex.id];if(r&&r.quantity!==null&&r.quantity!==undefined)all+=Number(r.quantity)||0});
+    let all=0;
+    Object.values(records).forEach(list=>{const r=list[ex.id];if(r&&r.quantity!==null&&r.quantity!==undefined)all+=Number(r.quantity)||0});
     const w=weekTotals(ex),p=w.goal?Math.min(w.done/w.goal*100,100):0,u=ex.unit||"reps";
     return `<article class="exercise"><div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Total acumulado: ${display(all,u)}</p><p>Meta semanal: ${display(w.goal,u)}</p></div><strong>${display(w.done,u)}</strong></div><div class="bar"><div class="fill" style="width:${p}%"></div></div><p>Progresso semanal</p></article>`;
   }).join(""):'<div class="empty">As estatísticas aparecerão depois dos primeiros registros.</div>';
 }
+
 function render(){renderHome();renderCalendar();renderExercises();renderStats()}
-function go(page){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===page));document.querySelectorAll("nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));render()}
+
+function go(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===page));
+  document.querySelectorAll("nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  render();
+}
+
 document.querySelectorAll("nav button[data-page]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
 $("prevMonth").onclick=()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()-1,1);renderCalendar()};
 $("nextMonth").onclick=()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,1);renderCalendar()};
 $("goToday").onclick=()=>{selectedDate=today();shownMonth=new Date();render()};
-$("calendar").addEventListener("click",e=>{const b=e.target.closest("[data-date]");if(!b)return;selectedDate=b.dataset.date;render()});
-$("exerciseForm").addEventListener("submit",e=>{
-  e.preventDefault();const name=$("exerciseName").value.trim(),unit=$("unit").value;
-  const daily=Number($("goalDaily").value),weekly=Number($("goalWeekly").value),sets=Number($("setsGoal").value),perSet=Number($("perSet").value);
-  if(!name||![daily,weekly,sets,perSet].every(n=>Number.isFinite(n)&&n>0)||!Number.isInteger(sets)){alert("Preencha os campos com valores maiores que zero. O número de séries deve ser inteiro.");return}
-  if(unit!=="minutes"&&![daily,weekly,perSet].every(Number.isInteger)){alert("Para repetições e segundos, use números inteiros. Para minutos, você pode usar decimais.");return}
-  if(editingId!==null){const ex=exercises.find(x=>x.id===editingId);if(ex)Object.assign(ex,{name,unit,daily,weekly,sets,perSet})}
-  else exercises.push({id:Date.now(),name,unit,daily,weekly,sets,perSet});
-  persist();editingId=null;$("exerciseForm").reset();$("unit").value="reps";$("formTitle").textContent="Adicionar exercício";$("submitExercise").textContent="Adicionar exercício";$("cancelEdit").classList.add("hidden");render();
+
+$("calendar").addEventListener("click",e=>{
+  const b=e.target.closest("[data-date]");
+  if(!b)return;
+  selectedDate=b.dataset.date;
+  render();
 });
-$("cancelEdit").onclick=()=>{editingId=null;$("exerciseForm").reset();$("unit").value="reps";$("formTitle").textContent="Adicionar exercício";$("submitExercise").textContent="Adicionar exercício";$("cancelEdit").classList.add("hidden")};
+
+$("exerciseForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("exerciseName").value.trim(),unit=$("unit").value;
+  const daily=Number($("goalDaily").value),weekly=Number($("goalWeekly").value),sets=Number($("setsGoal").value),perSet=Number($("perSet").value);
+  if(!name||![daily,weekly,sets,perSet].every(n=>Number.isFinite(n)&&n>0)||!Number.isInteger(sets)){
+    alert("Preencha os campos com valores maiores que zero. O número de séries deve ser inteiro.");
+    return;
+  }
+  if(unit!=="minutes"&&![daily,weekly,perSet].every(Number.isInteger)){
+    alert("Para repetições e segundos, use números inteiros. Para minutos, você pode usar decimais.");
+    return;
+  }
+  if(editingId!==null){
+    const ex=exercises.find(x=>x.id===editingId);
+    if(ex)Object.assign(ex,{name,unit,daily,weekly,sets,perSet});
+  }else exercises.push({id:Date.now(),name,unit,daily,weekly,sets,perSet});
+  persist();
+  editingId=null;
+  $("exerciseForm").reset();
+  $("unit").value="reps";
+  $("formTitle").textContent="Adicionar exercício";
+  $("submitExercise").textContent="Adicionar exercício";
+  $("cancelEdit").classList.add("hidden");
+  render();
+});
+
+$("cancelEdit").onclick=()=>{
+  editingId=null;
+  $("exerciseForm").reset();
+  $("unit").value="reps";
+  $("formTitle").textContent="Adicionar exercício";
+  $("submitExercise").textContent="Adicionar exercício";
+  $("cancelEdit").classList.add("hidden");
+};
+
 $("exerciseList").addEventListener("click",e=>{
   const edit=e.target.closest("[data-edit]"),del=e.target.closest("[data-delete]");
-  if(edit){const ex=exercises.find(x=>x.id===Number(edit.dataset.edit));if(!ex)return;editingId=ex.id;$("exerciseName").value=ex.name;$("unit").value=ex.unit||"reps";$("goalDaily").value=ex.daily;$("goalWeekly").value=ex.weekly;$("setsGoal").value=ex.sets;$("perSet").value=ex.perSet;$("formTitle").textContent="Editar exercício";$("submitExercise").textContent="Salvar alterações";$("cancelEdit").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})}
-  if(del){const id=Number(del.dataset.delete),ex=exercises.find(x=>x.id===id);if(!ex||!confirm(`Excluir ${ex.name} e seus registros?`))return;exercises=exercises.filter(x=>x.id!==id);Object.values(records).forEach(list=>delete list[id]);persist();render()}
+  if(edit){
+    const ex=exercises.find(x=>x.id===Number(edit.dataset.edit));
+    if(!ex)return;
+    editingId=ex.id;
+    $("exerciseName").value=ex.name;
+    $("unit").value=ex.unit||"reps";
+    $("goalDaily").value=ex.daily;
+    $("goalWeekly").value=ex.weekly;
+    $("setsGoal").value=ex.sets;
+    $("perSet").value=ex.perSet;
+    $("formTitle").textContent="Editar exercício";
+    $("submitExercise").textContent="Salvar alterações";
+    $("cancelEdit").classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+  if(del){
+    const id=Number(del.dataset.delete),ex=exercises.find(x=>x.id===id);
+    if(!ex||!confirm(`Excluir ${ex.name} e seus registros?`))return;
+    exercises=exercises.filter(x=>x.id!==id);
+    Object.values(records).forEach(list=>delete list[id]);
+    persist();
+    render();
+  }
 });
+
 document.addEventListener("click",e=>{
   const save=e.target.closest("[data-save]"),clear=e.target.closest("[data-clear]");
   if(save){
     const id=Number(save.dataset.save),date=save.dataset.date,card=save.closest(".exercise");
     const q=card?.querySelector(`[data-qty="${id}"]`),s=card?.querySelector(`[data-sets="${id}"]`);
-    if(!q||q.value.trim()===""){alert("Informe a quantidade deste treino.");return}
-    const ex=exercises.find(x=>x.id===id),unit=ex?.unit||"reps",quantity=Number(q.value),sets=s&&s.value.trim()!==""?Number(s.value):0;
-    if(!Number.isFinite(quantity)||quantity<0||(unit!=="minutes"&&!Number.isInteger(quantity))||!Number.isInteger(sets)||sets<0){alert("Confira a quantidade e as séries informadas.");return}
+    if(!q||q.value.trim()===""){alert("Informe a quantidade realizada.");return}
+    const ex=exercises.find(x=>x.id===id),unit=ex?.unit||"reps";
+    const quantity=Number(q.value),sets=s&&s.value.trim()!==""?Number(s.value):null;
+    if(!Number.isFinite(quantity)||quantity<0||(unit!=="minutes"&&!Number.isInteger(quantity))||(sets!==null&&(!Number.isInteger(sets)||sets<0))){
+      alert(unit==="minutes"?"Informe minutos válidos, usando zero ou um valor maior.":"Use números inteiros iguais ou maiores que zero.");
+      return;
+    }
     if(!records[date])records[date]={};
     const previous=records[date][id]||{quantity:0,sets:0};
-    records[date][id]={quantity:(Number(previous.quantity)||0)+quantity,sets:(Number(previous.sets)||0)+sets};
-    persist();render();
+    records[date][id]={
+      quantity:(Number(previous.quantity)||0)+quantity,
+      sets:(Number(previous.sets)||0)+(sets===null?0:sets)
+    };
+    persist();
+    render();
   }
-  if(clear){const id=Number(clear.dataset.clear),date=clear.dataset.date;if(confirm("Zerar o registro deste exercício nesta data?")){if(records[date])delete records[date][id];persist();render()}}
+  if(clear){
+    const id=Number(clear.dataset.clear),date=clear.dataset.date;
+    if(records[date])delete records[date][id];
+    persist();
+    render();
+  }
 });
+
 $("theme").onclick=()=>{
-  dark=!dark;const root=document.documentElement;
-  const values=dark?{bg:"#10130f",card:"#191e18",card2:"#222920",text:"#f2f5ef",muted:"#9ba697",border:"#30382d"}:{bg:"#f4f6f0",card:"#ffffff",card2:"#e9eee5",text:"#20261d",muted:"#687263",border:"#d8dfd1"};
-  Object.entries(values).forEach(([key,value])=>root.style.setProperty("--"+key,value));root.style.colorScheme=dark?"dark":"light";$("theme").textContent=dark?"☀️ Tema":"🌙 Tema";
+  dark=!dark;
+  const root=document.documentElement;
+  const values=dark
+    ?{bg:"#10130f",card:"#191e18",card2:"#222920",text:"#f2f5ef",muted:"#9ba697",border:"#30382d"}
+    :{bg:"#f4f6f0",card:"#ffffff",card2:"#e9eee5",text:"#20261d",muted:"#687263",border:"#d8dfd1"};
+  Object.entries(values).forEach(([key,value])=>root.style.setProperty("--"+key,value));
+  root.style.colorScheme=dark?"dark":"light";
+  $("theme").textContent=dark?"☀️ Tema":"🌙 Tema";
 };
+
 render();
+
 let installPrompt=null;
-window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();installPrompt=event;const b=$("installApp");if(b)b.classList.remove("hidden")});
-window.addEventListener("appinstalled",()=>{installPrompt=null;const b=$("installApp");if(b)b.classList.add("hidden")});
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/service-worker.js").catch(()=>{}))}
+window.addEventListener("beforeinstallprompt",event=>{
+  event.preventDefault();
+  installPrompt=event;
+  const b=$("installApp");
+  if(b)b.classList.remove("hidden");
+});
+window.addEventListener("appinstalled",()=>{
+  installPrompt=null;
+  const b=$("installApp");
+  if(b)b.classList.add("hidden");
+});
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("/service-worker.js").catch(()=>{}));
+}
+
 const installButton=$("installApp");
-if(installButton)installButton.addEventListener("click",async()=>{if(!installPrompt){alert("No Chrome, abra o menu e escolha 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");return}installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installButton.classList.add("hidden")});
+if(installButton)installButton.addEventListener("click",async()=>{
+  if(!installPrompt){
+    alert("No Chrome, abra o menu e escolha 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+    return;
+  }
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt=null;
+  installButton.classList.add("hidden");
+});
 </script>
 </body>
 </html>
