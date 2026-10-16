@@ -148,8 +148,8 @@ function persist(){
 }
 const fmt=n=>Number(n||0).toLocaleString("pt-BR",{maximumFractionDigits:2});
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const unitName=u=>({reps:"repetições",seconds:"segundos",minutes:"minutos"})[u]||"repetições";
-const shortUnit=u=>({reps:"rep.",seconds:"s",minutes:"min"})[u]||"rep.";
+const unitName=u=>({reps:"quant.",seconds:"s",minutes:"min"})[u]||"quant.";
+const shortUnit=u=>({reps:"quant.",seconds:"s",minutes:"min"})[u]||"quant.";
 function br(date){const[y,m,d]=date.split("-").map(Number);return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`}
 function longDate(date){const[y,m,d]=date.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
 function rec(id,date=selectedDate){return records[date]?.[id]||{quantity:null,sets:null}}
@@ -181,7 +181,7 @@ function summaryUnits(obj,key){
 function exerciseCard(ex,date){
   const r=rec(ex.id,date),s=status(ex,r),u=ex.unit||"reps";
   const step=u==="minutes"?"0.01":"1";
-  const label=u==="reps"?"Repetições realizadas":u==="seconds"?"Segundos realizados":"Minutos realizados";
+  const label=u==="reps"?"Quantidade realizada":u==="seconds"?"Segundos realizados":"Minutos realizados";
   return `<article class="exercise">
     <div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Meta diária: ${display(ex.daily,u)} · Semanal: ${display(ex.weekly,u)}</p><p>${fmt(ex.sets)} séries de ${display(ex.perSet,u)}</p></div><strong class="${colorClass(ex,r)}">${statusText(s)}</strong></div>
     <div class="fields">
