@@ -5,6 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111411">
+<meta name="description" content="Acompanhe seus exercícios, metas, calendário e estatísticas.">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
 <title>Meu Progresso</title>
 <style>
 :root{color-scheme:dark;--bg:#10130f;--card:#191e18;--card2:#222920;--text:#f2f5ef;--muted:#9ba697;--green:#b9f36b;--border:#30382d;--red:#ff7777;--gold:#f3c969}
@@ -50,6 +53,8 @@ nav button.active{background:var(--green);color:#17200e;border-color:var(--green
 .empty{color:var(--muted);text-align:center;padding:22px 8px;line-height:1.6}
 .form{display:grid;gap:12px}.form label{font-size:13px}.form-grid{margin:0}
 .hidden{display:none!important}
+.install-info{margin:0 0 18px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:var(--card);font-size:13px;color:var(--muted)}
+.install-info button{margin-top:9px}
 @media(max-width:500px){.app{padding:16px 11px 35px}.card{padding:13px;border-radius:16px}.number{font-size:21px}.day{min-height:40px;font-size:13px}.calendar,.weekdays{gap:3px}}
 </style>
 </head>
@@ -59,6 +64,11 @@ nav button.active{background:var(--green);color:#17200e;border-color:var(--green
   <div class="brand"><div class="logo">↗</div><div>Meu Progresso<div class="muted">Sua evolução, no seu ritmo</div></div></div>
   <button id="theme">☀️ Tema</button>
 </header>
+
+<div class="install-info" id="installInfo">
+  <span id="installText">Você pode adicionar este site à tela inicial do celular para usá-lo como app.</span>
+  <div><button id="installButton" class="hidden">Instalar app</button></div>
+</div>
 
 <nav>
   <button class="active" data-page="home">Início</button>
@@ -148,7 +158,6 @@ function persist(){
 }
 const fmt=n=>Number(n||0).toLocaleString("pt-BR",{maximumFractionDigits:2});
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const unitName=u=>({reps:"quant.",seconds:"s",minutes:"min"})[u]||"quant.";
 const shortUnit=u=>({reps:"quant.",seconds:"s",minutes:"min"})[u]||"quant.";
 function br(date){const[y,m,d]=date.split("-").map(Number);return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`}
 function longDate(date){const[y,m,d]=date.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
@@ -334,6 +343,43 @@ $("theme").onclick=()=>{
   Object.entries(values).forEach(([key,value])=>root.style.setProperty("--"+key,value));
   root.style.colorScheme=dark?"dark":"light";$("theme").textContent=dark?"☀️ Tema":"🌙 Tema";
 };
+
+let installPrompt=null;
+const installButton=$("installButton");
+const installText=$("installText");
+
+window.addEventListener("beforeinstallprompt",event=>{
+  event.preventDefault();
+  installPrompt=event;
+  installButton.classList.remove("hidden");
+  installText.textContent="Instale o Meu Progresso no seu dispositivo.";
+});
+
+installButton.addEventListener("click",async()=>{
+  if(!installPrompt)return;
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt=null;
+  installButton.classList.add("hidden");
+});
+
+window.addEventListener("appinstalled",()=>{
+  installText.textContent="App instalado! Você pode abri-lo pela tela inicial.";
+  installButton.classList.add("hidden");
+});
+
+if(window.matchMedia("(display-mode: standalone)").matches){
+  installText.textContent="Você está usando o Meu Progresso como app.";
+}
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(()=>console.log("App preparado para uso offline."))
+      .catch(error=>console.error("Erro ao registrar o service worker:",error));
+  });
+}
+
 render();
 </script>
 </body>
