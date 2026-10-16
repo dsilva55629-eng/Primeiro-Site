@@ -2,854 +2,348 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111411">
-  <title>Meu Progresso</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --fundo: #10130f;
-      --painel: #191e18;
-      --painel2: #222920;
-      --texto: #f2f5ef;
-      --suave: #9ba697;
-      --verde: #b9f36b;
-      --borda: #30382d;
-      --vermelho: #ff7777;
-      --dourado: #f3c969;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--fundo);
-      color: var(--texto);
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-
-    .app {
-      width: min(100%, 1000px);
-      margin: auto;
-      padding: 24px 18px 100px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-
-    .marca {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 19px;
-    }
-
-    .logo {
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: var(--verde);
-      color: #17200e;
-      font-size: 22px;
-    }
-
-    .data-atual { color: var(--suave); font-size: 13px; }
-
-    .botao {
-      border: 1px solid var(--borda);
-      background: var(--painel2);
-      color: var(--texto);
-      padding: 10px 14px;
-      border-radius: 12px;
-    }
-
-    .botao.principal {
-      background: var(--verde);
-      border-color: var(--verde);
-      color: #17200e;
-      font-weight: 750;
-    }
-
-    .boas-vindas { margin-bottom: 22px; }
-    .boas-vindas h1 {
-      font-size: clamp(26px, 6vw, 36px);
-      margin: 0 0 8px;
-      letter-spacing: -1px;
-    }
-
-    .boas-vindas p { margin: 0; color: var(--suave); }
-
-    .grade {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 13px;
-    }
-
-    .painel {
-      min-width: 0;
-      padding: 18px;
-      background: var(--painel);
-      border: 1px solid var(--borda);
-      border-radius: 20px;
-    }
-
-    .painel h2 { margin: 0 0 15px; font-size: 17px; }
-    .rotulo { color: var(--suave); font-size: 13px; }
-
-    .numero {
-      margin: 9px 0 4px;
-      font-size: 30px;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
-
-    .verde { color: var(--verde); }
-    .vermelho { color: var(--vermelho); }
-    .dourado { color: var(--dourado); }
-
-    .barra {
-      width: 100%;
-      height: 8px;
-      background: #30382d;
-      border-radius: 99px;
-      overflow: hidden;
-      margin: 13px 0 7px;
-    }
-
-    .preenchimento {
-      height: 100%;
-      width: 0%;
-      background: var(--verde);
-      border-radius: inherit;
-      transition: width .2s;
-    }
-
-    .secao { margin-top: 25px; }
-    .cabecalho-secao {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 13px;
-    }
-
-    .cabecalho-secao h2 { margin: 0; font-size: 20px; }
-
-    .dias-semana, .calendario {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 5px;
-    }
-
-    .dia-nome {
-      color: var(--suave);
-      text-align: center;
-      font-size: 11px;
-      padding: 8px 0;
-    }
-
-    .dia {
-      min-width: 0;
-      min-height: 48px;
-      border: 1px solid transparent;
-      border-radius: 12px;
-      background: var(--painel2);
-      color: var(--texto);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .dia.vazio { visibility: hidden; }
-    .dia.selecionado { border-color: var(--verde); }
-    .dia.hoje { box-shadow: inset 0 0 0 1px var(--suave); }
-    .dia .ponto { width: 6px; height: 6px; border-radius: 50%; }
-    .dia.concluido .ponto { background: var(--verde); }
-    .dia.baixo .ponto { background: var(--vermelho); }
-    .dia.excedido .ponto { background: var(--dourado); }
-    .dia.pendente .ponto { background: #788372; }
-
-    .lista-exercicios { display: grid; gap: 11px; }
-
-    .exercicio {
-      padding: 15px;
-      background: var(--painel2);
-      border-radius: 15px;
-      border: 1px solid var(--borda);
-    }
-
-    .exercicio-topo {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .exercicio h3 { margin: 0 0 5px; font-size: 16px; }
-    .exercicio p { margin: 0; color: var(--suave); font-size: 12px; }
-
-    .campo {
-      width: 100%;
-      min-width: 0;
-      background: var(--fundo);
-      border: 1px solid var(--borda);
-      color: var(--texto);
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 7px;
-    }
-
-    .campos-registro {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .campos-registro label { font-size: 12px; color: var(--suave); }
-
-    .acoes {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .vazio-texto {
-      padding: 24px 10px;
-      color: var(--suave);
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .navegacao {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 4px 0 10px;
-      margin-bottom: 18px;
-    }
-
-    .nav-item {
-      flex: 0 0 auto;
-      border: 1px solid var(--borda);
-      color: var(--suave);
-      background: var(--painel);
-      border-radius: 12px;
-      padding: 11px 14px;
-    }
-
-    .nav-item.ativo {
-      background: var(--verde);
-      color: #17200e;
-      border-color: var(--verde);
-      font-weight: 750;
-    }
-
-    .pagina { display: none; }
-    .pagina.ativa { display: block; }
-
-    .formulario {
-      display: grid;
-      gap: 12px;
-    }
-
-    .formulario label { color: var(--suave); font-size: 13px; }
-    .formulario input, .formulario select {
-      display: block;
-      width: 100%;
-      background: var(--fundo);
-      color: var(--texto);
-      border: 1px solid var(--borda);
-      border-radius: 11px;
-      padding: 12px;
-      margin-top: 6px;
-    }
-
-    .linha-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .aviso { color: var(--suave); font-size: 12px; line-height: 1.5; }
-
-    @media (max-width: 540px) {
-      .app { padding: 17px 12px 35px; }
-      header { margin-bottom: 23px; }
-      .painel { padding: 14px; border-radius: 16px; }
-      .grade { gap: 9px; }
-      .numero { font-size: 26px; }
-      .dia { min-height: 42px; border-radius: 9px; font-size: 13px; }
-      .dias-semana, .calendario { gap: 4px; }
-      .linha-form { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111411">
+<title>Meu Progresso</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#10130f; --card:#191e18; --card2:#222920;
+  --text:#f2f5ef; --muted:#9ba697; --green:#b9f36b;
+  --border:#30382d; --red:#ff7777; --gold:#f3c969;
+}
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,sans-serif }
+button,input { font:inherit }
+button { cursor:pointer }
+.app { width:min(100%,950px); margin:auto; padding:20px 14px 50px }
+header,.topline,.exercise-head { display:flex; align-items:center; justify-content:space-between; gap:12px }
+header { margin-bottom:25px }
+.brand { display:flex; align-items:center; gap:10px; font-size:19px; font-weight:800 }
+.logo { display:grid; place-items:center; background:var(--green); color:#17200e; width:42px; height:42px; border-radius:14px }
+.muted,.label { color:var(--muted); font-size:13px }
+h1 { font-size:clamp(27px,6vw,36px); margin:0 0 8px; letter-spacing:-1px }
+h2 { font-size:19px; margin:0 }
+p { line-height:1.5 }
+button { border:1px solid var(--border); background:var(--card2); color:var(--text); border-radius:12px; padding:10px 13px }
+.primary { background:var(--green); border-color:var(--green); color:#17200e; font-weight:750 }
+nav { display:flex; gap:8px; overflow-x:auto; margin-bottom:22px; padding-bottom:5px }
+nav button { flex:0 0 auto; background:var(--card); color:var(--muted) }
+nav button.active { background:var(--green); color:#17200e; border-color:var(--green); font-weight:750 }
+.page { display:none }
+.page.active { display:block }
+.intro { margin-bottom:22px }
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px }
+.card { background:var(--card); border:1px solid var(--border); border-radius:19px; padding:16px; min-width:0 }
+.number { font-size:29px; font-weight:800; margin:8px 0 4px; letter-spacing:-1px }
+.green { color:var(--green) }
+.red { color:var(--red) }
+.gold { color:var(--gold) }
+.bar { height:8px; background:var(--border); border-radius:99px; overflow:hidden; margin:12px 0 7px }
+.fill { height:100%; width:0; background:var(--green); border-radius:99px }
+.section { margin-top:20px }
+.section .topline { margin-bottom:13px }
+.weekdays,.calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px }
+.weekday { color:var(--muted); text-align:center; font-size:11px; padding:8px 0 }
+.day { min-width:0; min-height:45px; border:1px solid transparent; border-radius:10px; padding:5px 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px }
+.day.blank { visibility:hidden }
+.day.selected { border-color:var(--green) }
+.day.today { box-shadow:inset 0 0 0 1px var(--muted) }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--muted) }
+.day.low .dot { background:var(--red) }
+.day.done .dot { background:var(--green) }
+.day.over .dot { background:var(--gold) }
+.list { display:grid; gap:10px }
+.exercise { background:var(--card2); border:1px solid var(--border); border-radius:15px; padding:14px }
+.exercise h3 { margin:0 0 5px; font-size:16px }
+.exercise p { margin:3px 0; font-size:12px; color:var(--muted) }
+.fields,.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px }
+.fields label,.form label { font-size:12px; color:var(--muted) }
+input { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:10px; padding:11px; margin-top:6px; min-width:0 }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px }
+.empty { color:var(--muted); text-align:center; padding:22px 8px; line-height:1.6 }
+.form { display:grid; gap:12px }
+.form label { font-size:13px }
+.form-grid { margin:0 }
+.hidden { display:none!important }
+@media(max-width:500px) {
+  .app { padding:16px 11px 35px }
+  .card { padding:13px; border-radius:16px }
+  .number { font-size:25px }
+  .day { min-height:40px; font-size:13px }
+  .calendar,.weekdays { gap:3px }
+}
+</style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <div class="marca">
-        <div class="logo">↗</div>
-        <div>
-          Meu Progresso
-          <div class="data-atual">Seu espaço de evolução</div>
-        </div>
+<main class="app">
+<header>
+  <div class="brand"><div class="logo">↗</div><div>Meu Progresso<div class="muted">Sua evolução, no seu ritmo</div></div></div>
+  <button id="theme">☀️ Tema</button>
+</header>
+
+<nav>
+  <button class="active" data-page="home">Início</button>
+  <button data-page="calendarPage">Calendário</button>
+  <button data-page="exercisePage">Exercícios</button>
+  <button data-page="statsPage">Estatísticas</button>
+</nav>
+
+<section class="page active" id="home">
+  <div class="intro"><h1>Vamos evoluir.</h1><p class="muted" id="todayText"></p></div>
+  <div class="grid">
+    <div class="card"><div class="label">Meta de hoje</div><div class="number" id="dailyGoal">0</div><div class="muted">quantidades planejadas</div></div>
+    <div class="card"><div class="label">Realizado hoje</div><div class="number green" id="dailyDone">0</div><div class="muted">quantidades registradas</div></div>
+    <div class="card"><div class="label">Meus exercícios</div><div class="number" id="exerciseCount">0</div><div class="muted">metas cadastradas</div></div>
+    <div class="card"><div class="label">Progresso diário</div><div class="number" id="dailyPercent">—</div><div class="bar"><div class="fill" id="dailyBar"></div></div><div class="muted" id="dailyStatus">Sem registros</div></div>
+  </div>
+  <section class="section card"><div class="topline"><h2>Seu dia</h2><button data-go="calendarPage">Ver calendário →</button></div><p class="muted" id="selectedText"></p><div class="list" id="homeList"></div></section>
+</section>
+
+<section class="page" id="calendarPage">
+  <div class="intro"><h1>Calendário</h1><p class="muted">Escolha uma data para registrar ou consultar seu progresso.</p></div>
+  <section class="card">
+    <div class="topline"><button id="prevMonth">←</button><h2 id="monthTitle"></h2><button id="nextMonth">→</button></div>
+    <div class="weekdays"><div class="weekday">Seg</div><div class="weekday">Ter</div><div class="weekday">Qua</div><div class="weekday">Qui</div><div class="weekday">Sex</div><div class="weekday">Sáb</div><div class="weekday">Dom</div></div>
+    <div class="calendar" id="calendar"></div>
+    <p class="muted">Vermelho: abaixo da meta · Verde: atingida · Dourado: superada.</p>
+  </section>
+  <section class="section card"><div class="topline"><h2 id="chosenTitle"></h2><button id="goToday">Hoje</button></div><div class="list" id="calendarList"></div></section>
+</section>
+
+<section class="page" id="exercisePage">
+  <div class="intro"><h1>Exercícios</h1><p class="muted">Crie suas metas e personalize as séries.</p></div>
+  <section class="card">
+    <h2 id="formTitle">Adicionar exercício</h2>
+    <form id="exerciseForm" class="form">
+      <label>Nome do exercício<input id="exerciseName" maxlength="60" placeholder="Ex.: Flexões" required></label>
+      <div class="form-grid">
+        <label>Meta diária<input id="goalDaily" type="number" min="1" step="1" placeholder="50" required></label>
+        <label>Meta semanal<input id="goalWeekly" type="number" min="1" step="1" placeholder="350" required></label>
       </div>
-      <button class="botao" id="tema" type="button">☀️ Tema</button>
-    </header>
-
-    <nav class="navegacao" aria-label="Navegação principal">
-      <button class="nav-item ativo" data-pagina="inicio">Início</button>
-      <button class="nav-item" data-pagina="calendario">Calendário</button>
-      <button class="nav-item" data-pagina="exercicios">Exercícios</button>
-      <button class="nav-item" data-pagina="estatisticas">Estatísticas</button>
-    </nav>
-
-    <section class="pagina ativa" id="pagina-inicio">
-      <div class="boas-vindas">
-        <h1>Vamos evoluir.</h1>
-        <p id="data-legivel">Seu progresso, um dia de cada vez.</p>
+      <div class="form-grid">
+        <label>Número de séries<input id="setsGoal" type="number" min="1" step="1" placeholder="5" required></label>
+        <label>Quantidade por série<input id="perSet" type="number" min="1" step="1" placeholder="10" required></label>
       </div>
+      <p class="muted">Você pode registrar menos ou mais do que a meta. Os valores são personalizáveis.</p>
+      <div class="actions"><button class="primary" id="submitExercise">Adicionar exercício</button><button type="button" id="cancelEdit" class="hidden">Cancelar</button></div>
+    </form>
+  </section>
+  <section class="section card"><h2>Meus exercícios</h2><div class="list" id="exerciseList"></div></section>
+</section>
 
-      <div class="grade">
-        <article class="painel">
-          <div class="rotulo">Meta de hoje</div>
-          <div class="numero" id="resumo-meta">0</div>
-          <div class="rotulo">quantidades planejadas</div>
-        </article>
-        <article class="painel">
-          <div class="rotulo">Realizado hoje</div>
-          <div class="numero verde" id="resumo-realizado">0</div>
-          <div class="rotulo">quantidades registradas</div>
-        </article>
-        <article class="painel">
-          <div class="rotulo">Exercícios cadastrados</div>
-          <div class="numero" id="resumo-exercicios">0</div>
-          <div class="rotulo">exercícios ativos</div>
-        </article>
-        <article class="painel">
-          <div class="rotulo">Progresso diário</div>
-          <div class="numero" id="resumo-percentual">—</div>
-          <div class="barra"><div class="preenchimento" id="barra-hoje"></div></div>
-          <div class="rotulo" id="resumo-status">Ainda sem registros</div>
-        </article>
-      </div>
+<section class="page" id="statsPage">
+  <div class="intro"><h1>Estatísticas</h1><p class="muted">Acompanhe sua evolução.</p></div>
+  <div class="grid">
+    <div class="card"><div class="label">Total registrado</div><div class="number" id="totalAll">0</div><div class="muted">quantidades acumuladas</div></div>
+    <div class="card"><div class="label">Dias registrados</div><div class="number" id="daysAll">0</div><div class="muted">dias com registros</div></div>
+    <div class="card"><div class="label">Metas atingidas</div><div class="number" id="goalsAll">0</div><div class="muted">metas diárias concluídas</div></div>
+    <div class="card"><div class="label">Progresso semanal</div><div class="number" id="weeklyPercent">0%</div><div class="bar"><div class="fill" id="weeklyBar"></div></div><div class="muted" id="weeklyText"></div></div>
+  </div>
+  <section class="section card"><h2>Resumo por exercício</h2><div class="list" id="statsList"></div></section>
+</section>
+</main>
 
-      <section class="secao painel">
-        <div class="cabecalho-secao">
-          <h2>Seu dia</h2>
-          <button class="botao" id="ir-calendario">Ver calendário →</button>
-        </div>
-        <div class="rotulo" id="data-selecionada"></div>
-        <div class="lista-exercicios" id="lista-hoje"></div>
-      </section>
-    </section>
+<script>
+const $ = id => document.getElementById(id);
+const STORAGE = "meuProgresso_v1";
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
+let selectedDate = today();
+let shownMonth = new Date();
+let editingId = null;
+let dark = true;
 
-    <section class="pagina" id="pagina-calendario">
-      <div class="boas-vindas">
-        <h1>Calendário</h1>
-        <p>Escolha um dia para consultar ou registrar seu progresso.</p>
-      </div>
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(STORAGE) || "{}"); } catch {}
+let exercises = Array.isArray(saved.exercises) ? saved.exercises : [];
+let records = saved.records && typeof saved.records === "object" ? saved.records : {};
 
-      <div class="painel">
-        <div class="cabecalho-secao">
-          <button class="botao" id="mes-anterior" aria-label="Mês anterior">←</button>
-          <h2 id="mes-titulo">Mês</h2>
-          <button class="botao" id="mes-proximo" aria-label="Próximo mês">→</button>
-        </div>
-        <div class="dias-semana">
-          <div class="dia-nome">Seg</div><div class="dia-nome">Ter</div>
-          <div class="dia-nome">Qua</div><div class="dia-nome">Qui</div>
-          <div class="dia-nome">Sex</div><div class="dia-nome">Sáb</div>
-          <div class="dia-nome">Dom</div>
-        </div>
-        <div class="calendario" id="grade-calendario"></div>
-        <p class="aviso">Os indicadores de cada dia aparecerão conforme os registros forem salvos.</p>
-      </div>
-
-      <section class="secao painel">
-        <div class="cabecalho-secao">
-          <h2 id="titulo-dia">Registros do dia</h2>
-          <button class="botao" id="voltar-hoje">Hoje</button>
-        </div>
-        <div id="lista-calendario" class="lista-exercicios"></div>
-      </section>
-    </section>
-
-    <section class="pagina" id="pagina-exercicios">
-      <div class="boas-vindas">
-        <h1>Exercícios</h1>
-        <p>Personalize os exercícios, suas metas e suas séries.</p>
-      </div>
-
-      <div class="painel">
-        <h2 id="titulo-form-exercicio">Adicionar exercício</h2>
-        <form id="form-exercicio" class="formulario">
-          <label>Nome do exercício
-            <input id="nome-exercicio" placeholder="Ex.: Flexões" required maxlength="60">
-          </label>
-          <div class="linha-form">
-            <label>Meta diária (quantidade)
-              <input id="meta-diaria" type="number" min="1" step="1" placeholder="Ex.: 50" required>
-            </label>
-            <label>Meta semanal (quantidade)
-              <input id="meta-semanal" type="number" min="1" step="1" placeholder="Ex.: 350" required>
-            </label>
-          </div>
-          <div class="linha-form">
-            <label>Número de séries
-              <input id="numero-series" type="number" min="1" step="1" placeholder="Ex.: 5" required>
-            </label>
-            <label>Quantidade por série
-              <input id="por-serie" type="number" min="1" step="1" placeholder="Ex.: 10" required>
-            </label>
-          </div>
-          <p class="aviso">A meta e as séries são personalizáveis. Você pode registrar uma quantidade diferente da planejada.</p>
-          <div class="acoes">
-            <button class="botao principal" type="submit" id="salvar-exercicio">Adicionar exercício</button>
-            <button class="botao" type="button" id="cancelar-edicao" hidden>Cancelar</button>
-          </div>
-        </form>
-      </div>
-
-      <section class="secao painel">
-        <h2>Meus exercícios</h2>
-        <div id="lista-cadastro" class="lista-exercicios"></div>
-      </section>
-    </section>
-
-    <section class="pagina" id="pagina-estatisticas">
-      <div class="boas-vindas">
-        <h1>Estatísticas</h1>
-        <p>Acompanhe os registros feitos neste dispositivo.</p>
-      </div>
-      <div class="grade">
-        <article class="painel">
-          <div class="rotulo">Total registrado</div>
-          <div class="numero" id="estat-total">0</div>
-          <div class="rotulo">quantidades acumuladas</div>
-        </article>
-        <article class="painel">
-          <div class="rotulo">Dias registrados</div>
-          <div class="numero" id="estat-dias">0</div>
-          <div class="rotulo">dias com atividade registrada</div>
-        </article>
-        <article class="painel">
-          <div class="rotulo">Metas atingidas</div>
-          <div class="numero" id="estat-metas">0</div>
-          <div class="rotulo">metas diárias concluídas</div>
-        </article>
-        <article class="painel">
-          <div class="rotulo">Progresso semanal</div>
-          <div class="numero" id="estat-semana">0%</div>
-          <div class="barra"><div class="preenchimento" id="barra-semana"></div></div>
-          <div class="rotulo" id="texto-semana">Quantidade realizada / meta semanal</div>
-        </article>
-      </div>
-      <section class="secao painel">
-        <h2>Resumo por exercício</h2>
-        <div id="lista-estatisticas" class="lista-exercicios"></div>
-      </section>
-    </section>
-  </main>
-
-  <script>
-    const $ = id => document.getElementById(id);
-    const hoje = () => {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    };
-
-    let dataSelecionada = hoje();
-    let mesExibido = new Date();
-    let editandoId = null;
-    let exercicios = [];
-    let registros = {};
-    let temaEscuro = true;
-
-    const nomesMeses = [
-      "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-      "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-    ];
-
-    const dataBR = data => {
-      if (!data) return "";
-      const [a,m,d] = data.split("-").map(Number);
-      return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${a}`;
-    };
-
-    const dataLonga = data => {
-      const [a,m,d] = data.split("-").map(Number);
-      return new Date(a,m-1,d).toLocaleDateString("pt-BR", {
-        weekday:"long", day:"numeric", month:"long", year:"numeric"
-      });
-    };
-
-    const numero = n => Number(n || 0).toLocaleString("pt-BR");
-
-    function registro(id, data = dataSelecionada) {
-      return registros[data]?.[id] || { quantidade: null, series: null };
+function persist() {
+  try {
+    localStorage.setItem(STORAGE, JSON.stringify({exercises,records}));
+  } catch {
+    alert("Não foi possível salvar os dados neste navegador. Verifique o espaço disponível.");
+  }
+}
+const fmt = n => Number(n || 0).toLocaleString("pt-BR");
+const safe = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function br(date) {
+  const [y,m,d] = date.split("-").map(Number);
+  return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`;
+}
+function longDate(date) {
+  const [y,m,d] = date.split("-").map(Number);
+  return new Date(y,m-1,d).toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
+function rec(id,date=selectedDate) {
+  return records[date]?.[id] || {quantity:null,sets:null};
+}
+function status(ex,r) {
+  if (r.quantity === null || r.quantity === undefined) return "pending";
+  if (Number(r.quantity) < ex.daily) return "low";
+  if (Number(r.quantity) === ex.daily) return "done";
+  return "over";
+}
+function statusText(s) {
+  return ({pending:"Pendente",low:"Abaixo da meta",done:"Meta atingida",over:"Acima da meta"})[s];
+}
+function colorClass(ex,r) {
+  return ({pending:"",low:"red",done:"green",over:"gold"})[status(ex,r)];
+}
+function totals(date) {
+  let goal=0,done=0,count=0;
+  exercises.forEach(ex=>{
+    goal+=ex.daily;
+    const r=rec(ex.id,date);
+    if(r.quantity!==null&&r.quantity!==undefined){done+=Number(r.quantity);count++;}
+  });
+  return {goal,done,count};
+}
+function exerciseCard(ex,date) {
+  const r=rec(ex.id,date), s=status(ex,r);
+  return `<article class="exercise">
+    <div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Meta: ${fmt(ex.daily)} · ${fmt(ex.sets)} séries de ${fmt(ex.perSet)}</p></div><strong class="${colorClass(ex,r)}">${statusText(s)}</strong></div>
+    <div class="fields">
+      <label>Quantidade realizada<input type="number" min="0" step="1" inputmode="numeric" data-qty="${ex.id}" value="${r.quantity??""}" placeholder="Quantidade"></label>
+      <label>Séries realizadas<input type="number" min="0" step="1" inputmode="numeric" data-sets="${ex.id}" value="${r.sets??""}" placeholder="Séries"></label>
+    </div>
+    <div class="actions"><button class="primary" data-save="${ex.id}" data-date="${date}">Salvar registro</button><button data-clear="${ex.id}" data-date="${date}">Limpar</button></div>
+  </article>`;
+}
+function renderHome() {
+  const t=totals(today()), pct=t.goal?Math.round(t.done/t.goal*100):0;
+  $("todayText").textContent=longDate(today());
+  $("selectedText").textContent=longDate(selectedDate);
+  $("dailyGoal").textContent=fmt(t.goal);
+  $("dailyDone").textContent=fmt(t.done);
+  $("exerciseCount").textContent=fmt(exercises.length);
+  $("dailyPercent").textContent=t.count?pct+"%":"—";
+  $("dailyBar").style.width=Math.min(pct,100)+"%";
+  $("dailyStatus").textContent=t.count?`${t.count} de ${exercises.length} exercícios registrados`:"Ainda sem registros";
+  $("homeList").innerHTML=exercises.length?exercises.map(ex=>exerciseCard(ex,selectedDate)).join(""):`<div class="empty">Nenhum exercício cadastrado.<br>Entre em <b>Exercícios</b> para adicionar suas metas.</div>`;
+}
+function renderCalendar() {
+  const y=shownMonth.getFullYear(),m=shownMonth.getMonth();
+  $("monthTitle").textContent=`${["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][m]} ${y}`;
+  let html="", offset=(new Date(y,m,1).getDay()+6)%7, count=new Date(y,m+1,0).getDate();
+  for(let i=0;i<offset;i++) html+='<div class="day blank"></div>';
+  for(let d=1;d<=count;d++){
+    const date=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const t=totals(date);
+    let cls="day";
+    if(date===selectedDate)cls+=" selected";
+    if(date===today())cls+=" today";
+    if(t.count){const ratio=t.goal?t.done/t.goal:0;cls+=" "+(ratio<1?"low":ratio===1?"done":"over");}
+    html+=`<button class="${cls}" data-date="${date}">${d}<span class="dot"></span></button>`;
+  }
+  $("calendar").innerHTML=html;
+  $("chosenTitle").textContent=br(selectedDate);
+  $("calendarList").innerHTML=exercises.length?exercises.map(ex=>exerciseCard(ex,selectedDate)).join(""):'<div class="empty">Cadastre seus exercícios para começar.</div>';
+}
+function renderExercises() {
+  $("exerciseList").innerHTML=exercises.length?exercises.map(ex=>`<article class="exercise">
+    <div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Meta diária: ${fmt(ex.daily)} · Meta semanal: ${fmt(ex.weekly)}</p><p>${fmt(ex.sets)} séries de ${fmt(ex.perSet)}</p></div></div>
+    <div class="actions"><button data-edit="${ex.id}">Editar</button><button data-delete="${ex.id}">Excluir</button></div>
+  </article>`).join(""):'<div class="empty">Nenhum exercício cadastrado.</div>';
+}
+function weekStart(date) {
+  const [y,m,d]=date.split("-").map(Number), dt=new Date(y,m-1,d);
+  dt.setDate(dt.getDate()-(dt.getDay()+6)%7);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+}
+function weekTotals(ex) {
+  const start=weekStart(today()),[y,m,d]=start.split("-").map(Number);
+  let done=0;
+  for(let i=0;i<7;i++){
+    const dt=new Date(y,m-1,d+i), date=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+    const r=rec(ex.id,date);
+    if(r.quantity!==null&&r.quantity!==undefined)done+=Number(r.quantity);
+  }
+  return {done,goal:ex.weekly};
+}
+function renderStats() {
+  let total=0, days=new Set(), met=0;
+  Object.entries(records).forEach(([date,list])=>Object.entries(list).forEach(([id,r])=>{
+    if(r.quantity!==null&&r.quantity!==undefined){
+      total+=Number(r.quantity);days.add(date);
+      const ex=exercises.find(e=>e.id===Number(id));
+      if(ex&&Number(r.quantity)>=ex.daily)met++;
     }
-
-    function estado(ex, r) {
-      if (r.quantidade === null || r.quantidade === undefined) return "pendente";
-      if (r.quantidade < ex.metaDiaria) return "baixo";
-      if (r.quantidade === ex.metaDiaria) return "concluido";
-      return "excedido";
-    }
-
-    function nomeEstado(s) {
-      return ({
-        pendente:"Pendente",
-        baixo:"Abaixo da meta",
-        concluido:"Meta atingida",
-        excedido:"Acima da meta"
-      })[s];
-    }
-
-    function totaisDia(data) {
-      let meta = 0, realizado = 0, registrados = 0;
-      exercicios.forEach(ex => {
-        meta += ex.metaDiaria;
-        const r = registro(ex.id, data);
-        if (r.quantidade !== null && r.quantidade !== undefined) {
-          realizado += Number(r.quantidade);
-          registrados++;
-        }
-      });
-      return { meta, realizado, registrados };
-    }
-
-    function classeCor(ex, r) {
-      const s = estado(ex,r);
-      return s === "baixo" ? "vermelho" : s === "excedido" ? "dourado" : s === "concluido" ? "verde" : "";
-    }
-
-    function renderExercicio(ex, data, modo) {
-      const r = registro(ex.id,data);
-      const s = estado(ex,r);
-      const valor = r.quantidade ?? "";
-      const serie = r.series ?? "";
-      return `
-        <article class="exercicio">
-          <div class="exercicio-topo">
-            <div>
-              <h3>${esc(ex.nome)}</h3>
-              <p>Meta: ${numero(ex.metaDiaria)} · ${numero(ex.series)} séries de ${numero(ex.porSerie)}</p>
-            </div>
-            <span class="${classeCor(ex,r)}">${nomeEstado(s)}</span>
-          </div>
-          <div class="campos-registro">
-            <label>Quantidade realizada
-              <input class="campo" type="number" min="0" step="1" inputmode="numeric"
-                data-quantidade="${ex.id}" value="${valor}" placeholder="Não registrado">
-            </label>
-            <label>Séries realizadas
-              <input class="campo" type="number" min="0" step="1" inputmode="numeric"
-                data-series="${ex.id}" value="${serie}" placeholder="Não registrado">
-            </label>
-          </div>
-          <div class="acoes">
-            <button class="botao principal" data-salvar="${ex.id}" data-data="${data}">Salvar registro</button>
-            <button class="botao" data-limpar="${ex.id}" data-data="${data}">Limpar</button>
-          </div>
-        </article>`;
-    }
-
-    function esc(texto) {
-      return String(texto).replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      })[c]);
-    }
-
-    function renderInicio() {
-      const t = totaisDia(hoje());
-      $("data-legivel").textContent = dataLonga(hoje());
-      $("data-selecionada").textContent = dataLonga(dataSelecionada);
-      $("resumo-meta").textContent = numero(t.meta);
-      $("resumo-realizado").textContent = numero(t.realizado);
-      $("resumo-exercicios").textContent = numero(exercicios.length);
-      const percent = t.meta ? Math.round(t.realizado/t.meta*100) : 0;
-      $("resumo-percentual").textContent = t.registrados ? percent+"%" : "—";
-      $("barra-hoje").style.width = Math.min(percent,100)+"%";
-      $("resumo-status").textContent = t.registrados
-        ? `${t.registrados} de ${exercicios.length} exercícios registrados`
-        : "Ainda sem registros";
-      $("lista-hoje").innerHTML = exercicios.length
-        ? exercicios.map(ex => renderExercicio(ex,dataSelecionada,"inicio")).join("")
-        : `<div class="vazio-texto">Você ainda não cadastrou exercícios.<br>Abra <b>Exercícios</b> para criar sua primeira meta.</div>`;
-    }
-
-    function renderCalendario() {
-      const ano = mesExibido.getFullYear(), mes = mesExibido.getMonth();
-      $("mes-titulo").textContent = `${nomesMeses[mes]} ${ano}`;
-      const primeiro = (new Date(ano,mes,1).getDay()+6)%7;
-      const dias = new Date(ano,mes+1,0).getDate();
-      let html = "";
-      for (let i=0;i<primeiro;i++) html += `<div class="dia vazio"></div>`;
-      for (let d=1;d<=dias;d++) {
-        const data = `${ano}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-        const t = totaisDia(data);
-        let classes = "dia";
-        if (data === dataSelecionada) classes += " selecionado";
-        if (data === hoje()) classes += " hoje";
-        let status = "";
-        if (t.registrados) {
-          const pct = t.meta ? t.realizado/t.meta : 0;
-          status = pct < 1 ? "baixo" : pct === 1 ? "concluido" : "excedido";
-          classes += " "+status;
-        } else if (exercicios.length) {
-          classes += " pendente";
-        }
-        html += `<button class="${classes}" data-escolher-data="${data}" aria-label="${d} de ${nomesMeses[mes]}">
-          <span>${d}</span><span class="ponto"></span></button>`;
-      }
-      $("grade-calendario").innerHTML = html;
-      $("titulo-dia").textContent = dataBR(dataSelecionada);
-      $("lista-calendario").innerHTML = exercicios.length
-        ? exercicios.map(ex => renderExercicio(ex,dataSelecionada,"calendario")).join("")
-        : `<div class="vazio-texto">Cadastre seus exercícios para começar a acompanhar os dias.</div>`;
-    }
-
-    function renderCadastro() {
-      $("lista-cadastro").innerHTML = exercicios.length ? exercicios.map(ex => `
-        <article class="exercicio">
-          <div class="exercicio-topo"><div>
-            <h3>${esc(ex.nome)}</h3>
-            <p>Meta diária: ${numero(ex.metaDiaria)} · Meta semanal: ${numero(ex.metaSemanal)}</p>
-            <p>${numero(ex.series)} séries de ${numero(ex.porSerie)}</p>
-          </div></div>
-          <div class="acoes">
-            <button class="botao" data-editar="${ex.id}">Editar</button>
-            <button class="botao" data-excluir="${ex.id}">Excluir</button>
-          </div>
-        </article>`).join("")
-        : `<div class="vazio-texto">Nenhum exercício cadastrado ainda.</div>`;
-    }
-
-    function segundaDaSemana(data) {
-      const [a,m,d] = data.split("-").map(Number);
-      const dt = new Date(a,m-1,d);
-      dt.setDate(dt.getDate() - (dt.getDay()+6)%7);
-      return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
-    }
-
-    function somarSemana(ex) {
-      const inicio = segundaDaSemana(hoje());
-      const [a,m,d] = inicio.split("-").map(Number);
-      let meta = 0, realizado = 0;
-      for (let i=0;i<7;i++) {
-        const dt = new Date(a,m-1,d+i);
-        const data = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
-        meta += ex.metaSemanal/7;
-        const r = registro(ex.id,data);
-        if (r.quantidade !== null && r.quantidade !== undefined) realizado += Number(r.quantidade);
-      }
-      return { meta:ex.metaSemanal, realizado };
-    }
-
-    function renderEstatisticas() {
-      let total = 0, dias = new Set(), metas = 0;
-      Object.entries(registros).forEach(([data,lista]) => {
-        Object.entries(lista).forEach(([id,r]) => {
-          if (r.quantidade !== null && r.quantidade !== undefined) {
-            total += Number(r.quantidade);
-            dias.add(data);
-            const ex = exercicios.find(e => e.id === Number(id));
-            if (ex && Number(r.quantidade) >= ex.metaDiaria) metas++;
-          }
-        });
-      });
-      $("estat-total").textContent = numero(total);
-      $("estat-dias").textContent = numero(dias.size);
-      $("estat-metas").textContent = numero(metas);
-      let metaSemana = 0, realizadoSemana = 0;
-      exercicios.forEach(ex => {
-        const s = somarSemana(ex);
-        metaSemana += s.meta;
-        realizadoSemana += s.realizado;
-      });
-      const p = metaSemana ? Math.round(realizadoSemana/metaSemana*100) : 0;
-      $("estat-semana").textContent = p+"%";
-      $("barra-semana").style.width = Math.min(p,100)+"%";
-      $("texto-semana").textContent = `${numero(realizadoSemana)} / ${numero(metaSemana)} quantidades`;
-      $("lista-estatisticas").innerHTML = exercicios.length ? exercicios.map(ex => {
-        let acumulado = 0;
-        Object.values(registros).forEach(lista => {
-          const r = lista[ex.id];
-          if (r && r.quantidade !== null && r.quantidade !== undefined) acumulado += Number(r.quantidade);
-        });
-        const s = somarSemana(ex);
-        return `<article class="exercicio"><div class="exercicio-topo">
-          <div><h3>${esc(ex.nome)}</h3><p>Total registrado: ${numero(acumulado)}</p></div>
-          <strong>${numero(s.realizado)} / ${numero(s.meta)}</strong>
-        </div><div class="barra"><div class="preenchimento" style="width:${Math.min(s.meta ? s.realizado/s.meta*100 : 0,100)}%"></div></div>
-        <p class="rotulo">Meta semanal e quantidade registrada nesta semana</p></article>`;
-      }).join("") : `<div class="vazio-texto">Suas estatísticas aparecerão aqui depois de cadastrar exercícios.</div>`;
-    }
-
-    function renderTudo() {
-      renderInicio();
-      renderCalendario();
-      renderCadastro();
-      renderEstatisticas();
-    }
-
-    function irPara(pagina) {
-      document.querySelectorAll(".pagina").forEach(p => p.classList.remove("ativa"));
-      document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("ativo",b.dataset.pagina===pagina));
-      $("pagina-"+pagina).classList.add("ativa");
-      renderTudo();
-    }
-
-    document.querySelectorAll(".nav-item").forEach(b =>
-      b.addEventListener("click",() => irPara(b.dataset.pagina))
-    );
-
-    $("ir-calendario").addEventListener("click",() => irPara("calendario"));
-    $("mes-anterior").addEventListener("click",() => {
-      mesExibido = new Date(mesExibido.getFullYear(),mesExibido.getMonth()-1,1);
-      renderCalendario();
-    });
-    $("mes-proximo").addEventListener("click",() => {
-      mesExibido = new Date(mesExibido.getFullYear(),mesExibido.getMonth()+1,1);
-      renderCalendario();
-    });
-    $("voltar-hoje").addEventListener("click",() => {
-      dataSelecionada = hoje();
-      mesExibido = new Date();
-      renderTudo();
-    });
-
-    $("grade-calendario").addEventListener("click",e => {
-      const b = e.target.closest("[data-escolher-data]");
-      if (!b) return;
-      dataSelecionada = b.dataset.escolherData;
-      renderTudo();
-    });
-
-    $("form-exercicio").addEventListener("submit",e => {
-      e.preventDefault();
-      const nome = $("nome-exercicio").value.trim();
-      const metaDiaria = Number($("meta-diaria").value);
-      const metaSemanal = Number($("meta-semanal").value);
-      const series = Number($("numero-series").value);
-      const porSerie = Number($("por-serie").value);
-      if (!nome || ![metaDiaria,metaSemanal,series,porSerie].every(n => Number.isInteger(n)&&n>0)) {
-        alert("Preencha todos os campos com valores inteiros maiores que zero.");
-        return;
-      }
-      if (editandoId !== null) {
-        const ex = exercicios.find(e => e.id === editandoId);
-        if (ex) Object.assign(ex,{nome,metaDiaria,metaSemanal,series,porSerie});
-      } else {
-        exercicios.push({id:Date.now(),nome,metaDiaria,metaSemanal,series,porSerie});
-      }
-      editandoId = null;
-      $("form-exercicio").reset();
-      $("titulo-form-exercicio").textContent = "Adicionar exercício";
-      $("salvar-exercicio").textContent = "Adicionar exercício";
-      $("cancelar-edicao").hidden = true;
-      renderTudo();
-    });
-
-    $("cancelar-edicao").addEventListener("click",() => {
-      editandoId = null;
-      $("form-exercicio").reset();
-      $("titulo-form-exercicio").textContent = "Adicionar exercício";
-      $("salvar-exercicio").textContent = "Adicionar exercício";
-      $("cancelar-edicao").hidden = true;
-    });
-
-    $("lista-cadastro").addEventListener("click",e => {
-      const editar = e.target.closest("[data-editar]");
-      const excluir = e.target.closest("[data-excluir]");
-      if (editar) {
-        const ex = exercicios.find(x => x.id === Number(editar.dataset.editar));
-        if (!ex) return;
-        editandoId = ex.id;
-        $("nome-exercicio").value = ex.nome;
-        $("meta-diaria").value = ex.metaDiaria;
-        $("meta-semanal").value = ex.metaSemanal;
-        $("numero-series").value = ex.series;
-        $("por-serie").value = ex.porSerie;
-        $("titulo-form-exercicio").textContent = "Editar exercício";
-        $("salvar-exercicio").textContent = "Salvar alterações";
-        $("cancelar-edicao").hidden = false;
-        irPara("exercicios");
-        window.scrollTo({top:0,behavior:"smooth"});
-      }
-      if (excluir) {
-        const id = Number(excluir.dataset.excluir);
-        const ex = exercicios.find(x => x.id === id);
-        if (!ex || !confirm(`Excluir "${ex.nome}"? Os registros anteriores deste exercício também serão removidos desta sessão.`)) return;
-        exercicios = exercicios.filter(x => x.id !== id);
-        Object.values(registros).forEach(lista => delete lista[id]);
-        renderTudo();
-      }
-    });
-
-    document.addEventListener("click",e => {
-      const salvar = e.target.closest("[data-salvar]");
-      const limpar = e.target.closest("[data-limpar]");
-      if (salvar) {
-        const id = Number(salvar.dataset.salvar);
-        const data = salvar.dataset.data;
-        const q = document.querySelector(`[data-quantidade="${id}"]`);
-        const s = document.querySelector(`[data-series="${id}"]`);
-        if (!q || q.value.trim()==="") {
-          alert("Informe a quantidade realizada. Para deixar pendente, use Limpar.");
-          return;
-        }
-        const quantidade = Number(q.value);
-        const series = s.value.trim()==="" ? null : Number(s.value);
-        if (!Number.isInteger(quantidade)||quantidade<0||
-            (series!==null&&(!Number.isInteger(series)||series<0))) {
-          alert("Use números inteiros iguais ou maiores que zero.");
-          return;
-        }
-        if (!registros[data]) registros[data] = {};
-        registros[data][id] = {quantidade,series};
-        renderTudo();
-      }
-      if (limpar) {
-        const id = Number(limpar.dataset.limpar);
-        const data = limpar.dataset.data;
-        if (registros[data]) delete registros[data][id];
-        renderTudo();
-      }
-    });
-
-    $("tema").addEventListener("click",() => {
-      temaEscuro = !temaEscuro;
-      document.documentElement.style.colorScheme = temaEscuro ? "dark" : "light";
-      document.documentElement.style.setProperty("--fundo",temaEscuro?"#10130f":"#f4f6f0");
-      document.documentElement.style.setProperty("--painel",temaEscuro?"#191e18":"#ffffff");
-      document.documentElement.style.setProperty("--painel2",temaEscuro?"#222920":"#e9eee5");
-      document.documentElement.style.setProperty("--texto",temaEscuro?"#f2f5ef":"#20261d");
-      document.documentElement.style.setProperty("--suave",temaEscuro?"#9ba697":"#687263");
-      document.documentElement.style.setProperty("--borda",temaEscuro?"#30382d":"#d8dfd1");
-      $("tema").textContent = temaEscuro ? "☀️ Tema" : "🌙 Tema";
-    });
-
-    renderTudo();
-  </script>
+  }));
+  $("totalAll").textContent=fmt(total);$("daysAll").textContent=fmt(days.size);$("goalsAll").textContent=fmt(met);
+  let goal=0,done=0;
+  exercises.forEach(ex=>{const w=weekTotals(ex);goal+=w.goal;done+=w.done;});
+  const pct=goal?Math.round(done/goal*100):0;
+  $("weeklyPercent").textContent=pct+"%";$("weeklyBar").style.width=Math.min(pct,100)+"%";
+  $("weeklyText").textContent=`${fmt(done)} / ${fmt(goal)} quantidades nesta semana`;
+  $("statsList").innerHTML=exercises.length?exercises.map(ex=>{
+    let all=0;
+    Object.values(records).forEach(list=>{const r=list[ex.id];if(r&&r.quantity!==null&&r.quantity!==undefined)all+=Number(r.quantity);});
+    const w=weekTotals(ex),p=w.goal?Math.min(w.done/w.goal*100,100):0;
+    return `<article class="exercise"><div class="exercise-head"><div><h3>${safe(ex.name)}</h3><p>Total acumulado: ${fmt(all)}</p></div><strong>${fmt(w.done)} / ${fmt(w.goal)}</strong></div><div class="bar"><div class="fill" style="width:${p}%"></div></div><p>Quantidade semanal realizada / meta semanal</p></article>`;
+  }).join(""):'<div class="empty">As estatísticas aparecerão depois dos primeiros registros.</div>';
+}
+function render() {renderHome();renderCalendar();renderExercises();renderStats();}
+function go(page) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===page));
+  document.querySelectorAll("nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  render();
+}
+document.querySelectorAll("nav button[data-page]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+$("prevMonth").onclick=()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()-1,1);renderCalendar();};
+$("nextMonth").onclick=()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,1);renderCalendar();};
+$("goToday").onclick=()=>{selectedDate=today();shownMonth=new Date();render();};
+$("calendar").addEventListener("click",e=>{const b=e.target.closest("[data-date]");if(!b)return;selectedDate=b.dataset.date;render();});
+$("exerciseForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("exerciseName").value.trim();
+  const daily=Number($("goalDaily").value),weekly=Number($("goalWeekly").value),sets=Number($("setsGoal").value),perSet=Number($("perSet").value);
+  if(!name||![daily,weekly,sets,perSet].every(n=>Number.isInteger(n)&&n>0)){alert("Preencha os campos com números inteiros maiores que zero.");return;}
+  if(editingId!==null){const ex=exercises.find(x=>x.id===editingId);if(ex)Object.assign(ex,{name,daily,weekly,sets,perSet});}
+  else exercises.push({id:Date.now(),name,daily,weekly,sets,perSet});
+  persist();editingId=null;$("exerciseForm").reset();$("formTitle").textContent="Adicionar exercício";$("submitExercise").textContent="Adicionar exercício";$("cancelEdit").classList.add("hidden");render();
+});
+$("cancelEdit").onclick=()=>{editingId=null;$("exerciseForm").reset();$("formTitle").textContent="Adicionar exercício";$("submitExercise").textContent="Adicionar exercício";$("cancelEdit").classList.add("hidden");};
+$("exerciseList").addEventListener("click",e=>{
+  const edit=e.target.closest("[data-edit]"),del=e.target.closest("[data-delete]");
+  if(edit){
+    const ex=exercises.find(x=>x.id===Number(edit.dataset.edit));if(!ex)return;
+    editingId=ex.id;$("exerciseName").value=ex.name;$("goalDaily").value=ex.daily;$("goalWeekly").value=ex.weekly;$("setsGoal").value=ex.sets;$("perSet").value=ex.perSet;
+    $("formTitle").textContent="Editar exercício";$("submitExercise").textContent="Salvar alterações";$("cancelEdit").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});
+  }
+  if(del){
+    const id=Number(del.dataset.delete),ex=exercises.find(x=>x.id===id);if(!ex||!confirm(`Excluir ${ex.name} e seus registros?`))return;
+    exercises=exercises.filter(x=>x.id!==id);Object.values(records).forEach(list=>delete list[id]);persist();render();
+  }
+});
+document.addEventListener("click",e=>{
+  const save=e.target.closest("[data-save]"),clear=e.target.closest("[data-clear]");
+  if(save){
+    const id=Number(save.dataset.save),date=save.dataset.date;
+    const q=document.querySelector(`[data-qty="${id}"]`),s=document.querySelector(`[data-sets="${id}"]`);
+    if(!q||q.value.trim()===""){alert("Informe a quantidade realizada.");return;}
+    const quantity=Number(q.value),sets=s.value.trim()===""?null:Number(s.value);
+    if(!Number.isInteger(quantity)||quantity<0||(sets!==null&&(!Number.isInteger(sets)||sets<0))){alert("Use números inteiros iguais ou maiores que zero.");return;}
+    if(!records[date])records[date]={};records[date][id]={quantity,sets};persist();render();
+  }
+  if(clear){
+    const id=Number(clear.dataset.clear),date=clear.dataset.date;
+    if(records[date])delete records[date][id];persist();render();
+  }
+});
+$("theme").onclick=()=>{
+  dark=!dark;
+  const root=document.documentElement;
+  const values=dark?{bg:"#10130f",card:"#191e18",card2:"#222920",text:"#f2f5ef",muted:"#9ba697",border:"#30382d"}:{bg:"#f4f6f0",card:"#ffffff",card2:"#e9eee5",text:"#20261d",muted:"#687263",border:"#d8dfd1"};
+  Object.entries(values).forEach(([key,value])=>root.style.setProperty("--"+key,value));
+  root.style.colorScheme=dark?"dark":"light";$("theme").textContent=dark?"☀️ Tema":"🌙 Tema";
+};
+render();
+</script>
 </body>
 </html>
-
