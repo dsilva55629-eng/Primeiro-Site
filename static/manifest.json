@@ -1,0 +1,20 @@
+
+{
+  "name": "Meu Progresso",
+  "short_name": "Progresso",
+  "description": "Acompanhe seus exercícios, metas e estatísticas.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111411",
+  "theme_color": "#111411",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
